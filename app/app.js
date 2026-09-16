@@ -113,9 +113,18 @@
       return { label: f(l.label), value: l.text != null ? f(l.text) : (vals[l.key] ? vals[l.key].text : "") };
     });
     var fu = sc.followUp;
+    // Primary question: fixed-order tiers (Arm B) or a shuffled recommendation set (Arm C).
+    var primary;
+    if (sc.ask) {
+      primary = { kind: "ask", stem: f(sc.ask.stem), options: shuffle(sc.ask.options.map(function (o) { return { text: f(o.text), correct: !!o.correct }; })) };
+    } else {
+      primary = { kind: "tier", options: ["1", "2", "3", "4"].map(function (k) { return { tier: k, text: DATA.tiers[k], correct: String(sc.tier) === k }; }) };
+    }
     return {
       sc: sc,
       vals: vals,
+      primary: primary,
+      call: sc.call ? f(sc.call) : "",
       patient: {
         title: p.age + "-year-old " + p.sex,
         living: f(p.living),
@@ -187,11 +196,11 @@
     document.querySelectorAll("#setup-form fieldset[data-mode]").forEach(function (fs) {
       fs.classList.toggle("hidden", fs.getAttribute("data-mode") !== mode);
     });
-    if (mode === "B") {
-      var n = DATA.scenarios.length;
+    if (mode === "B" || mode === "C") {
+      var n = (mode === "B" ? DATA.scenarios : DATA.calls).length;
       $("pool-note").textContent = n + " scenarios available.";
       $("start").disabled = !n;
-      $("start").textContent = "Start scenarios";
+      $("start").textContent = mode === "B" ? "Start scenarios" : "Start calls";
       return;
     }
     $("start").textContent = "Start drill";
@@ -343,7 +352,7 @@
     var sc = r.sc;
     $("sc-progress").style.width = (100 * bSession.idx / bSession.items.length) + "%";
     $("sc-count").textContent = "Scenario " + (bSession.idx + 1) + " of " + bSession.items.length;
-    $("sc-score").textContent = bSession.answered ? bSession.tierCorrect + " tier" + (bSession.tierCorrect === 1 ? "" : "s") + " correct so far" : "";
+    $("sc-score").textContent = bSession.answered ? bSession.tierCorrect + " correct so far" : "";
     $("sc-focus").textContent = sc.focus;
     $("sc-domain").textContent = "domain " + sc.domain;
 
@@ -374,14 +383,23 @@
       t.appendChild(tr);
     });
 
+    var isAsk = r.primary.kind === "ask";
+    $("sc-primary-title").textContent = isAsk ? "Recommendation" : "Disposition";
+    $("sc-primary-stem").textContent = isAsk ? r.primary.stem : "";
+    $("sc-primary-stem").classList.toggle("hidden", !isAsk);
+    $("sc-factors-title").textContent = isAsk ? "What drove the recommendation" : "What drove the tier";
     var box = $("sc-tiers");
     box.innerHTML = "";
-    ["1", "2", "3", "4"].forEach(function (k) {
-      var b = el("button", "option tier");
+    r.primary.options.forEach(function (o, i) {
+      var b = el("button", isAsk ? "option" : "option tier");
       b.type = "button";
-      b.appendChild(el("span", "tier-num", "Tier " + k));
-      b.appendChild(el("span", null, DATA.tiers[k]));
-      b.addEventListener("click", function () { answerTier(k); });
+      if (isAsk) {
+        b.textContent = o.text;
+      } else {
+        b.appendChild(el("span", "tier-num", "Tier " + o.tier));
+        b.appendChild(el("span", null, o.text));
+      }
+      b.addEventListener("click", function () { answerPrimary(i); });
       box.appendChild(b);
     });
     $("sc-feedback").classList.add("hidden");
@@ -390,23 +408,28 @@
     window.scrollTo({ top: 0 });
   }
 
-  function answerTier(k) {
+  function answerPrimary(i) {
     var r = bSession.items[bSession.idx];
     var sc = r.sc;
-    var correct = String(sc.tier) === k;
-    $("sc-tiers").querySelectorAll("button").forEach(function (b, i) {
+    var opts = r.primary.options;
+    var correct = !!opts[i].correct;
+    $("sc-tiers").querySelectorAll("button").forEach(function (b, j) {
       b.disabled = true;
-      var tier = String(i + 1);
-      if (tier === String(sc.tier)) b.classList.add("is-correct");
-      else if (tier === k) b.classList.add("is-wrong");
+      if (opts[j].correct) b.classList.add("is-correct");
+      else if (j === i) b.classList.add("is-wrong");
     });
     bSession.answered++;
     if (correct) bSession.tierCorrect++; else bSession.missed.push(sc);
 
     var row = LAB[sc.focus];
+    var right = opts.filter(function (o) { return o.correct; })[0];
     $("sc-verdict").textContent = correct ? "Correct" : "Not quite";
     $("sc-verdict").className = "verdict " + (correct ? "ok" : "bad");
-    $("sc-answer").textContent = correct ? "" : "Correct disposition: Tier " + sc.tier + " — " + DATA.tiers[String(sc.tier)];
+    $("sc-answer").textContent = correct ? "" : (r.primary.kind === "tier"
+      ? "Correct disposition: Tier " + right.tier + " — " + right.text
+      : "Correct recommendation: " + right.text);
+    $("sc-call-block").classList.toggle("hidden", !r.call);
+    $("sc-call").textContent = r.call;
     $("sc-rationale").textContent = r.rationale;
     ul("sc-factors", r.factors);
     $("sc-ref").textContent = row.name + ": " + row.ref + (row.units && row.units !== "—" && row.units !== "qualitative" ? " (" + row.units + ")" : "");
@@ -465,14 +488,14 @@
   function showScenarioSummary() {
     var n = bSession.answered;
     $("summary-score").textContent = n
-      ? bSession.tierCorrect + " of " + n + " dispositions correct; " + bSession.fuCorrect + " of " + n + " follow-ups"
+      ? bSession.tierCorrect + " of " + n + (bSession.items[0].primary.kind === "tier" ? " dispositions" : " recommendations") + " correct; " + bSession.fuCorrect + " of " + n + " follow-ups"
       : "No scenarios answered";
     var box = $("summary-missed");
     box.innerHTML = "";
     if (bSession.missed.length) {
       box.appendChild(el("h3", null, "Missed dispositions"));
       var u = el("ul", "missed");
-      bSession.missed.forEach(function (sc) { u.appendChild(el("li", null, sc.title + " (tier " + sc.tier + ")")); });
+      bSession.missed.forEach(function (sc) { u.appendChild(el("li", null, sc.title + (sc.tier ? " (tier " + sc.tier + ")" : ""))); });
       box.appendChild(u);
     }
     $("btn-retry-missed").classList.toggle("hidden", !bSession.missed.length);
@@ -565,8 +588,8 @@
     $("setup-form").addEventListener("submit", function (e) {
       e.preventDefault();
       var c = selectedCount();
-      if (selectedMode() === "B") {
-        var all = shuffle(DATA.scenarios.slice());
+      if (selectedMode() === "B" || selectedMode() === "C") {
+        var all = shuffle((selectedMode() === "B" ? DATA.scenarios : DATA.calls).slice());
         var m = c === "all" ? all.length : Math.min(parseInt(c, 10), all.length);
         startScenarioSession(all.slice(0, m));
         return;
@@ -610,8 +633,10 @@
     fetchJSON("data/bands.json"),
     fetchJSON("data/arm-a-items.json"),
     fetchJSON("data/arm-b-scenarios.json"),
-    fetchJSON("data/protocol.json")
+    fetchJSON("data/protocol.json"),
+    fetchJSON("data/arm-c-calls.json")
   ]).then(function (res) {
+    DATA.calls = res[5].scenarios;
     DATA.table = res[0];
     DATA.bands = res[1];
     DATA.items = res[2].items;

@@ -92,6 +92,7 @@ button.link { background: none; border: 0; color: var(--accent); cursor: pointer
 .level-card.mixed { --lvl: var(--muted); }
 .level-card.mode-a { --lvl: var(--accent); }
 .level-card.mode-b { --lvl: var(--fiendish); }
+.level-card.mode-c { --lvl: var(--advanced); }
 .mode-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .level-card input { position: absolute; opacity: 0; pointer-events: none; }
 .level-card b { display: block; font-size: 1.05rem; margin-bottom: 0.15rem; }
@@ -200,6 +201,7 @@ dd { margin: 0; color: var(--muted); font-size: 0.92rem; }
 .option.tier { display: flex; gap: 0.8rem; align-items: baseline; }
 .tier-num { flex: none; font-weight: 700; color: var(--accent); min-width: 3.4rem; }
 #sc-factors { margin: 0; padding-left: 1.1rem; }
+.call { font-style: italic; border-left: 3px solid var(--accent); padding-left: 0.7rem; }
 
 footer { margin: 2rem auto 1.5rem; }
 

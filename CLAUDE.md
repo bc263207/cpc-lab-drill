@@ -4,12 +4,13 @@ Working document. Covers what is decided, what is open, and the rules any item m
 
 ## What this is
 
-A practice app for the IBSC CP-C exam. Primary purpose: **exam pass rate.** Two arms.
+A practice app for the IBSC CP-C exam. Primary purpose: **exam pass rate.** Three arms.
 
 - **Arm A: lab value drill.** Three-way classification: normal, abnormal, or abnormal-but-baseline-for-this-patient.
 - **Arm B: disposition scenarios.** The main product. A lab value is one input among several, never the deciding factor on its own.
+- **Arm C: provider calls.** Patients who stay home. The drill is the recommendation to the primary care provider (hold, reduce, retime, substitute, titrate, stop an over-the-counter product) and what to arrange afterward. Same patient model and value engine as Arm B; an `ask` question replaces the tier, and a model `call` script is shown in feedback. Ten scenarios in v1.
 
-Arm A is the drill layer feeding Arm B.
+Arm A is the drill layer feeding Arms B and C.
 
 ## Build and hosting
 
@@ -105,6 +106,7 @@ Ketones in scenarios are urine dipstick results only. Never use blood ketone met
 - Every item quoting creatinine, hemoglobin, BNP, or troponin must state a baseline. Enforced in the template.
 - Albumin, hematinics, HbA1c, and pending cultures are designed with no correct transport answer. Preserve this.
 - **Arm B:** one patient per scenario; tier question plus one follow-up; one standard program protocol; ~40 scenarios in v1 (decided 2026-09-16).
+- **Arm C:** ten provider-call scenarios, every one managed in place; recommendation question plus follow-up; model call script in feedback (decided 2026-09-16).
 - **Sepsis:** Sepsis-3. Lactate over 4 mmol/L threshold stands.
 - **Troponin:** the textbook (0–0.4 ng/mL) and the conventional troponin I cutoff (about 0.04 ng/mL) differ tenfold. Randomized troponin values must never fall between 0.04 and 0.4. Normal items use values at or below 0.02. Abnormal items use values of 0.5 or higher. The row notes the discrepancy.
 

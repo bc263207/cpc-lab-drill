@@ -358,10 +358,13 @@ def scenario_texts(sc):
     out += [sc.get("rationale", "")] + list(sc.get("factors", []) or [])
     fu = sc.get("followUp", {}) or {}
     out += [fu.get("stem", ""), fu.get("rationale", "")] + [o.get("text", "") for o in fu.get("options", []) or []]
+    ask = sc.get("ask", {}) or {}
+    out += [ask.get("stem", ""), sc.get("call", "")] + [o.get("text", "") for o in ask.get("options", []) or []]
     return [t for t in out if t]
 
 
-def check_scenario(sc, bands, table_by_name, seen_ids):
+def check_scenario(sc, bands, table_by_name, seen_ids, kind="B"):
+    """kind B: disposition tier + follow-up. kind C: provider-call recommendation ('ask') + follow-up."""
     iid = sc.get("id")
     if not iid:
         errors.append("[?] scenario without id: %s" % json.dumps(sc)[:80])
@@ -375,8 +378,19 @@ def check_scenario(sc, bands, table_by_name, seen_ids):
         err(iid, "focus lab %r is not in the master table" % focus)
         return
     row = table_by_name[focus]
-    if str(sc.get("tier")) not in TIERS:
-        err(iid, "tier must be 1-4")
+    if kind == "B":
+        if str(sc.get("tier")) not in TIERS:
+            err(iid, "tier must be 1-4")
+    else:
+        if "tier" in sc:
+            err(iid, "provider-call scenarios carry no tier; every one is managed in place")
+        ask = sc.get("ask")
+        if not ask or not ask.get("stem") or not ask.get("options"):
+            err(iid, "missing ask (the recommendation question)")
+        else:
+            check_mcq(iid + "/ask", ask["options"], ask.get("lengthException"))
+        if not (sc.get("call") or "").strip():
+            err(iid, "missing call (model phrasing of the recommendation)")
     if not sc.get("domain"):
         warn(iid, "no blueprint domain tag")
     if not (sc.get("title") or "").strip():
@@ -469,7 +483,7 @@ def check_scenario(sc, bands, table_by_name, seen_ids):
         warn(iid, "focus lab %r is not quoted in any value (acceptable when the missing test is the teaching point)" % focus)
 
     # Settled decisions.
-    if focus in NO_TRANSPORT_LABS and str(sc.get("tier")) in ("1", "2"):
+    if kind == "B" and focus in NO_TRANSPORT_LABS and str(sc.get("tier")) in ("1", "2"):
         err(iid, "%s scenarios must not resolve to a transport tier (settled decision)" % focus)
 
     joined = "\n".join(texts).lower()
@@ -660,6 +674,7 @@ def main():
     bands = load("bands.json")
     bank = load("arm-a-items.json")
     scen = load("arm-b-scenarios.json")
+    calls = load("arm-c-calls.json")
     protocol = load("protocol.json")
 
     table_by_name = check_master_table(table)
@@ -691,6 +706,10 @@ def main():
     seen_b = set()
     for sc in scenarios:
         check_scenario(sc, bands, table_by_name, seen_b)
+    call_scenarios = calls.get("scenarios", [])
+    seen_c = set()
+    for sc in call_scenarios:
+        check_scenario(sc, bands, table_by_name, seen_c, kind="C")
 
     # Summary.
     by_level = Counter(i.get("level") for i in items)
@@ -714,6 +733,7 @@ def main():
     by_focus = Counter(sc.get("focus") for sc in scenarios)
     print("  scenarios (Arm B): %d  (tier 1 %d, tier 2 %d, tier 3 %d, tier 4 %d); focus labs covered: %d"
           % (len(scenarios), by_tier["1"], by_tier["2"], by_tier["3"], by_tier["4"], len(by_focus)))
+    print("  provider calls (Arm C): %d; focus labs covered: %d" % (len(call_scenarios), len(set(sc.get("focus") for sc in call_scenarios))))
     if scenarios:
         for t in TIERS:
             share = 100.0 * by_tier[t] / len(scenarios)

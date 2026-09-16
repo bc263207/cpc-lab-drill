@@ -12,6 +12,7 @@ Practice app for the IBSC CP-C exam. Static site, no backend, no login, nothing 
 | `data/bands.json` | Numeric transcription of the master table's ranges and bands, plus the safety-margin exclusion zones. The generator and the validator both read it. If it ever disagrees with the master table, fix this file. |
 | `data/arm-a-items.json` | Arm A item bank. Item format documented in the file header. |
 | `data/arm-b-scenarios.json` | Arm B disposition scenarios: one patient per scenario, tier answer, follow-up question. Format in the file header. |
+| `data/arm-c-calls.json` | Arm C provider-call scenarios: same structure as Arm B with an `ask` (recommendation) question and a model `call` script instead of a tier. |
 | `data/protocol.json` | The standard program protocol every scenario assumes; rendered on the About page and inside each scenario. |
 | `scripts/validate.py` | Pre-deploy checks. Netlify runs it as the build command; a failure blocks the deploy. |
 
