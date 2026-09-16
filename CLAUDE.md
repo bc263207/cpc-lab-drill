@@ -19,7 +19,7 @@ Arm A is the drill layer feeding Arm B.
 - Ungraded drill only. Instant feedback with rationale, reference range, and source.
 - Collect no student names, emails, or other identifiers.
 - Moodle integration deferred. Keep the item bank format clean so a Moodle XML export can be added later.
-- Build Arm A first. Arm B waits for the patient model.
+- Arm A is built. Arm B is built on the patient model below.
 
 ## Source documents
 
@@ -86,6 +86,17 @@ Breaking the medic's transport-or-refusal habit is most of the work.
 
 Ketones in scenarios are urine dipstick results only. Never use blood ketone meter values in Arm B.
 
+### Arm B patient model (settled)
+
+- **One patient per scenario**, inline on the scenario. No recurring panel.
+- Patient card fields, all required: age, sex, living situation, diagnoses, medications (with doses), dated baseline labs, social and functional context (transportation, support, adherence, cognition, mobility), goals of care.
+- Visit: reason, history, vitals, exam. Today's results as generator specs from `data/bands.json`, the same engine as Arm A; qualitative results (dipstick, urine ketones) as text.
+- `focus` names the master-table row the answer key leans on; it supplies the reference range and source shown in feedback.
+- Answer: one tier (1–4), a rationale, and the list of findings that drove the tier. Then **one follow-up question** (four options, same construction rules as Arm A) on the next action, the reconciliation catch or the coordination step.
+- **One standard program protocol** (`data/protocol.json`) applies to every scenario and is shown in the app; a scenario may state an exception in its visit text.
+- Target mix: each tier between roughly 15% and 35% of scenarios, biased toward non-transport, because breaking the transport-or-refusal habit is most of the work.
+- First version: 40 scenarios.
+
 ## Settled decisions
 
 - Content targets the knowledge gap, not the basics.
@@ -93,12 +104,13 @@ Ketones in scenarios are urine dipstick results only. Never use blood ketone met
 - Record-review values mostly generate care-plan, reconciliation, and coordination items, not disposition items.
 - Every item quoting creatinine, hemoglobin, BNP, or troponin must state a baseline. Enforced in the template.
 - Albumin, hematinics, HbA1c, and pending cultures are designed with no correct transport answer. Preserve this.
+- **Arm B:** one patient per scenario; tier question plus one follow-up; one standard program protocol; ~40 scenarios in v1 (decided 2026-09-16).
 - **Sepsis:** Sepsis-3. Lactate over 4 mmol/L threshold stands.
 - **Troponin:** the textbook (0–0.4 ng/mL) and the conventional troponin I cutoff (about 0.04 ng/mL) differ tenfold. Randomized troponin values must never fall between 0.04 and 0.4. Normal items use values at or below 0.02. Abnormal items use values of 0.5 or higher. The row notes the discrepancy.
 
 ## Open
 
-1. **Arm B patient model.** Next content step. Fields likely needed: demographics, diagnoses, baseline labs with dates, current medications, social and functional context (transportation, support at home, adherence history), and protocol authority.
+1. ~~Arm B patient model.~~ Settled; see Arm B disposition tiers above.
 2. **Mechanical mitral valve INR target (2.5–3.5).** Textbook gives only 2.0–3.0. Noted in the row, not removed.
 3. **Public health vocabulary arm.** Community Based Needs plus Preventative Care is 33 of 110 items. Terms like "windshield assessment" live here. Likely needs its own arm or glossary drill.
 4. **Additional analytes** for fiendish. Deferred.
@@ -142,7 +154,8 @@ A validation script runs before every deploy. The build fails if any item has:
 - an excluded (post-2016) drug or test
 - a blood ketone meter value in an Arm B scenario or in basic or advanced Arm A items
 - a missing rationale, reference range, or source
-- a non-U.S. spelling anywhere in the item bank, band file, or master table
+- a non-U.S. spelling anywhere in the item bank, scenario bank, protocol, band file, or master table
+- an Arm B scenario with an incomplete patient card, a tier outside 1–4, a missing follow-up, a blood ketone value, a urine ketone result other than negative/trace/small/moderate/large, or a transport tier on a no-transport focus lab (albumin, hematinics, HbA1c, pending cultures)
 - multiple-choice options whose longest is more than 50% longer than the shortest (warning above 25%)
 
 It also warns on: a qualifier only in the correct answer; absolutes in two or more distractors but not the correct answer; overlapping choices; and, across the bank, the correct answer being the longest or the shortest choice in more than 40% of items or sitting in one position more than 40% of the time.

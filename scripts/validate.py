@@ -109,6 +109,13 @@ QUALIFIERS = re.compile(r"\b(typically|generally|usually|often|may|might|most ap
 MCQ_LENGTH_WARN = 1.25
 MCQ_LENGTH_FAIL = 1.5
 
+# Labs the settled decisions say never produce a correct transport answer.
+NO_TRANSPORT_LABS = ("HbA1c", "Albumin", "Hematinics — ferritin, B12, vitamin D", "Pending cultures and outstanding results at discharge")
+URINE_KETONE_RESULTS = ("negative", "trace", "small", "moderate", "large")
+TIERS = ("1", "2", "3", "4")
+
+MCQ_SETS = []  # (id, options) for bank-level answer-pattern statistics
+
 errors = []
 warnings = []
 
@@ -305,6 +312,191 @@ def item_texts(item):
     return texts
 
 
+def check_mcq(iid, opts, length_exception=False):
+    """Answer-choice construction rules (CLAUDE.md). Shared by Arm A items and Arm B follow-ups."""
+    MCQ_SETS.append((iid, opts))
+    if len(opts) < 3:
+        err(iid, "mcq needs at least 3 options")
+    correct = [o for o in opts if o.get("correct")]
+    wrong = [o for o in opts if not o.get("correct")]
+    if len(correct) != 1:
+        err(iid, "mcq needs exactly one correct option, found %d" % len(correct))
+    for o in opts:
+        if not (o.get("text") or "").strip():
+            err(iid, "empty option text")
+    lens = [len(o.get("text", "")) for o in opts]
+    ratio = float(max(lens)) / max(1, min(lens))
+    if length_exception:
+        pass  # enumerated names (drug lists, test names) differ in length for content reasons
+    elif ratio > MCQ_LENGTH_FAIL:
+        err(iid, "answer choices differ in length by %.0f%% (longest %d, shortest %d chars); keep within 25%%" % ((ratio - 1) * 100, max(lens), min(lens)))
+    elif ratio > MCQ_LENGTH_WARN:
+        warn(iid, "answer choices differ in length by %.0f%% (limit 25%% unless content requires it)" % ((ratio - 1) * 100))
+    if correct:
+        ct = correct[0].get("text", "")
+        q = QUALIFIERS.search(ct)
+        if q and not any(QUALIFIERS.search(o.get("text", "")) for o in wrong):
+            warn(iid, "only the correct answer carries a qualifier (%r)" % q.group(0))
+        if not ABSOLUTES.search(ct) and sum(1 for o in wrong if ABSOLUTES.search(o.get("text", ""))) >= 2:
+            warn(iid, "absolutes appear in two or more distractors but not in the correct answer")
+        for o in wrong:
+            a, b = o.get("text", "").lower().rstrip("."), ct.lower().rstrip(".")
+            if a and b and a != b and (a in b or b in a):
+                warn(iid, "overlapping choices: %r and %r" % (o.get("text"), ct))
+
+
+def scenario_texts(sc):
+    """Every human-readable string in a scenario, for spelling, era and placeholder checks."""
+    out = []
+    p = sc.get("patient", {}) or {}
+    out += [p.get("living", ""), p.get("goals", "")]
+    out += list(p.get("diagnoses", []) or []) + list(p.get("medications", []) or []) + list(p.get("baselines", []) or [])
+    out += [str(v) for v in (p.get("social", {}) or {}).values()]
+    v = sc.get("visit", {}) or {}
+    out += [v.get("reason", ""), v.get("history", ""), v.get("vitals", ""), v.get("exam", "")]
+    out += [l.get("label", "") + " " + l.get("text", "") for l in sc.get("labs", []) or []]
+    out += [sc.get("rationale", "")] + list(sc.get("factors", []) or [])
+    fu = sc.get("followUp", {}) or {}
+    out += [fu.get("stem", ""), fu.get("rationale", "")] + [o.get("text", "") for o in fu.get("options", []) or []]
+    return [t for t in out if t]
+
+
+def check_scenario(sc, bands, table_by_name, seen_ids):
+    iid = sc.get("id")
+    if not iid:
+        errors.append("[?] scenario without id: %s" % json.dumps(sc)[:80])
+        return
+    if iid in seen_ids:
+        err(iid, "duplicate id")
+    seen_ids.add(iid)
+
+    focus = sc.get("focus")
+    if focus not in table_by_name:
+        err(iid, "focus lab %r is not in the master table" % focus)
+        return
+    row = table_by_name[focus]
+    if str(sc.get("tier")) not in TIERS:
+        err(iid, "tier must be 1-4")
+    if not sc.get("domain"):
+        warn(iid, "no blueprint domain tag")
+    if not (sc.get("title") or "").strip():
+        err(iid, "missing title")
+
+    # Patient card completeness (the Arm B patient model, CLAUDE.md).
+    p = sc.get("patient") or {}
+    for key in ("age", "sex", "living", "diagnoses", "medications", "baselines", "social", "goals"):
+        if key not in p or p[key] in ("", None, [], {}):
+            err(iid, "patient card missing %s" % key)
+    for key in ("transport", "support", "adherence", "cognition", "mobility"):
+        if not (p.get("social", {}) or {}).get(key):
+            err(iid, "patient.social missing %s" % key)
+    v = sc.get("visit") or {}
+    for key in ("reason", "history", "vitals", "exam"):
+        if not v.get(key):
+            err(iid, "visit missing %s" % key)
+
+    # Rationale, factors, reference range, source.
+    if not (sc.get("rationale") or "").strip():
+        err(iid, "missing rationale")
+    if not sc.get("factors"):
+        err(iid, "missing factors (the findings that drove the tier)")
+    if not (row.get("ref") or "").strip():
+        err(iid, "reference range could not be resolved from the focus row")
+    if not ((sc.get("source") or row.get("source") or "").strip()):
+        err(iid, "missing source")
+
+    # Values: same engine as Arm A. Every value must name its lab.
+    values = sc.get("values", {}) or {}
+    pseudo = {"id": iid, "lab": focus, "values": values}
+    resolved = {}
+    for key, val in values.items():
+        if not isinstance(val, dict):
+            err(iid, "value %r must be an object" % key)
+            continue
+        if not val.get("lab"):
+            err(iid, "value %r must name its lab" % key)
+            continue
+        r = check_value(pseudo, key, val, bands, table_by_name)
+        if r:
+            resolved[key] = r
+
+    # Today's labs list.
+    shown = set()
+    for l in sc.get("labs", []) or []:
+        if not l.get("label"):
+            err(iid, "lab entry without a label")
+        if "text" in l:
+            txt = (l.get("text") or "").strip()
+            if not txt:
+                err(iid, "lab %r has an empty text result" % l.get("label"))
+            if re.search(r"ketone", l.get("label", ""), re.I) and txt.lower() not in URINE_KETONE_RESULTS:
+                err(iid, "urine ketone result must be one of %s, got %r" % (URINE_KETONE_RESULTS, txt))
+            continue
+        k = l.get("key")
+        if k not in values:
+            err(iid, "lab entry %r references unknown value %r" % (l.get("label"), k))
+            continue
+        if values[k].get("context"):
+            err(iid, "lab entry %r shows a context (baseline) value as today's result" % l.get("label"))
+        shown.add(k)
+
+    # Placeholders resolve; every non-context value is shown as a lab or referenced in text.
+    texts = scenario_texts(sc)
+    used = set()
+    for t in texts:
+        for m in PLACEHOLDER.finditer(t):
+            used.add(m.group(1))
+            if m.group(1) not in values:
+                err(iid, "placeholder {%s} has no value spec" % m.group(1))
+    for key, val in values.items():
+        if key not in used and key not in shown:
+            err(iid, "value %r is defined but never shown" % key)
+
+    # Baseline rule: creatinine, hemoglobin, BNP, troponin quoted today need a stated baseline.
+    for key, r in resolved.items():
+        if r.get("context"):
+            continue
+        lab = r["lab"]
+        if lab in bands.get("baselineRequired", []):
+            has_ctx = any(rr.get("context") and rr["lab"] == lab for rr in resolved.values())
+            mentioned = any(re.search(re.escape(lab.split(" ")[0]), b, re.I) for b in p.get("baselines", []) or [])
+            if not (has_ctx or mentioned):
+                err(iid, "quotes %s today but the patient card states no baseline for it" % lab)
+
+    # Focus lab must actually be quoted or be a qualitative row.
+    focus_spec = bands["labs"].get(focus, {})
+    if not focus_spec.get("qualitative") and focus not in [r["lab"] for r in resolved.values()]:
+        warn(iid, "focus lab %r is not quoted in any value (acceptable when the missing test is the teaching point)" % focus)
+
+    # Settled decisions.
+    if focus in NO_TRANSPORT_LABS and str(sc.get("tier")) in ("1", "2"):
+        err(iid, "%s scenarios must not resolve to a transport tier (settled decision)" % focus)
+
+    joined = "\n".join(texts).lower()
+    for pattern in BLOOD_KETONE_TERMS:
+        if re.search(pattern, joined):
+            err(iid, "blood ketone meter content is not allowed in Arm B (matched %r)" % pattern)
+    for pattern, label in EXCLUDED_TERMS:
+        if re.search(pattern, joined):
+            err(iid, "mentions excluded content: %s" % label)
+    if re.search(r"\bmetformin\b.{0,60}\begfr\b|\begfr\b.{0,60}\bmetformin\b", joined, flags=re.S):
+        err(iid, "metformin dosed by eGFR is excluded; build it on the creatinine cutoff")
+    for t in texts:
+        hit = british_hit(t)
+        if hit:
+            err(iid, "non-U.S. spelling %r" % hit)
+            break
+
+    # Follow-up question.
+    fu = sc.get("followUp")
+    if not fu or not fu.get("stem") or not fu.get("options"):
+        err(iid, "missing followUp question")
+    else:
+        if not (fu.get("rationale") or "").strip():
+            err(iid, "followUp missing rationale")
+        check_mcq(iid + "/followUp", fu["options"], fu.get("lengthException"))
+
+
 def check_item(item, bands, table_by_name, seen_ids):
     iid = item.get("id")
     if not iid:
@@ -418,15 +610,8 @@ def check_item(item, bands, table_by_name, seen_ids):
             if not (item.get("baseline") or "").strip():
                 err(iid, "answer 'baseline' but no baseline is stated")
     elif item.get("type") == "mcq":
-        opts = item.get("options") or []
-        if len(opts) < 3:
-            err(iid, "mcq needs at least 3 options")
-        correct = [o for o in opts if o.get("correct")]
-        if len(correct) != 1:
-            err(iid, "mcq needs exactly one correct option, found %d" % len(correct))
-        for o in opts:
-            if not (o.get("text") or "").strip():
-                err(iid, "empty option text")
+        if not item.get("options"):
+            err(iid, "mcq needs options")
         if item.get("answer"):
             err(iid, "mcq items use options, not answer")
         if item.get("level") == "basic":
@@ -441,28 +626,7 @@ def check_item(item, bands, table_by_name, seen_ids):
 
     # Multiple-choice construction (CLAUDE.md, item-writing rules).
     if item.get("type") == "mcq" and item.get("options"):
-        opts = item["options"]
-        lens = [len(o.get("text", "")) for o in opts]
-        ratio = float(max(lens)) / max(1, min(lens))
-        if item.get("lengthException"):
-            pass  # enumerated names (drug lists, test names) differ in length for content reasons
-        elif ratio > MCQ_LENGTH_FAIL:
-            err(iid, "answer choices differ in length by %.0f%% (longest %d, shortest %d chars); keep within 25%%" % ((ratio - 1) * 100, max(lens), min(lens)))
-        elif ratio > MCQ_LENGTH_WARN:
-            warn(iid, "answer choices differ in length by %.0f%% (limit 25%% unless content requires it)" % ((ratio - 1) * 100))
-        correct = [o for o in opts if o.get("correct")]
-        wrong = [o for o in opts if not o.get("correct")]
-        if correct:
-            ct = correct[0].get("text", "")
-            q = QUALIFIERS.search(ct)
-            if q and not any(QUALIFIERS.search(o.get("text", "")) for o in wrong):
-                warn(iid, "only the correct answer carries a qualifier (%r)" % q.group(0))
-            if not ABSOLUTES.search(ct) and sum(1 for o in wrong if ABSOLUTES.search(o.get("text", ""))) >= 2:
-                warn(iid, "absolutes appear in two or more distractors but not in the correct answer")
-            for o in wrong:
-                a, b = o.get("text", "").lower().rstrip("."), ct.lower().rstrip(".")
-                if a and b and a != b and (a in b or b in a):
-                    warn(iid, "overlapping choices: %r and %r" % (o.get("text"), ct))
+        check_mcq(iid, item["options"], item.get("lengthException"))
 
     # Era boundary and rejected content.
     joined = "\n".join(item_texts(item)).lower()
@@ -483,7 +647,7 @@ def check_item(item, bands, table_by_name, seen_ids):
         err(iid, "the table forbids normal-vs-abnormal items on amylase/lipase")
     if lab == "Serum osmolality" and item.get("type") == "classify":
         err(iid, "the table forbids numeric classification items on osmolality")
-    if lab == "HbA1c" or lab == "Albumin" or lab == "Haematinics — ferritin, B12, vitamin D" or lab == "Pending cultures and outstanding results at discharge":
+    if lab == "HbA1c" or lab == "Albumin" or lab == "Hematinics — ferritin, B12, vitamin D" or lab == "Pending cultures and outstanding results at discharge":
         for o in item.get("options") or []:
             if o.get("correct") and re.search(r"\btransport\b", o.get("text", "").lower()) and not re.search(r"\b(no|not|never|nothing)\b.*\btransport\b|\btransport\b.*\b(is not|never)\b", o.get("text", "").lower()):
                 err(iid, "%s items must not have a transport answer (settled decision)" % lab)
@@ -495,6 +659,8 @@ def main():
     table = load("lab-master-table.json")
     bands = load("bands.json")
     bank = load("arm-a-items.json")
+    scen = load("arm-b-scenarios.json")
+    protocol = load("protocol.json")
 
     table_by_name = check_master_table(table)
     check_bands_file(bands, table_by_name)
@@ -512,11 +678,19 @@ def main():
                 err(path, "non-U.S. spelling %r" % hit)
     walk(table, "table")
     walk(bands, "bands")
+    walk(protocol, "protocol")
+    if not protocol.get("sections"):
+        err("protocol", "protocol.json has no sections")
 
     items = bank.get("items", [])
     seen = set()
     for item in items:
         check_item(item, bands, table_by_name, seen)
+
+    scenarios = scen.get("scenarios", [])
+    seen_b = set()
+    for sc in scenarios:
+        check_scenario(sc, bands, table_by_name, seen_b)
 
     # Summary.
     by_level = Counter(i.get("level") for i in items)
@@ -535,13 +709,23 @@ def main():
         warn("bank", "analytes with no items: %s" % ", ".join(unused))
     print("  analytes covered: %d of %d" % (len(by_lab), len(table_by_name)))
 
-    # Answer-key patterns across the multiple-choice set.
-    mcqs = [i for i in items if i.get("type") == "mcq" and i.get("options")]
+    # Arm B summary.
+    by_tier = Counter(str(sc.get("tier")) for sc in scenarios)
+    by_focus = Counter(sc.get("focus") for sc in scenarios)
+    print("  scenarios (Arm B): %d  (tier 1 %d, tier 2 %d, tier 3 %d, tier 4 %d); focus labs covered: %d"
+          % (len(scenarios), by_tier["1"], by_tier["2"], by_tier["3"], by_tier["4"], len(by_focus)))
+    if scenarios:
+        for t in TIERS:
+            share = 100.0 * by_tier[t] / len(scenarios)
+            if share > 40 or share < 12:
+                warn("bank", "tier %s is %.0f%% of scenarios; keep each tier between roughly 15%% and 35%%" % (t, share))
+
+    # Answer-key patterns across every multiple-choice set (Arm A items and Arm B follow-ups).
+    mcqs = MCQ_SETS
     if mcqs:
         pos = Counter()
         longest = middle = shortest = 0
-        for i in mcqs:
-            opts = i["options"]
+        for _, opts in mcqs:
             ci = [k for k, o in enumerate(opts) if o.get("correct")]
             if not ci:
                 continue
@@ -555,7 +739,7 @@ def main():
             else:
                 middle += 1
         n = len(mcqs)
-        print("  mcq items: %d; correct answer is longest %d (%.0f%%), middle %d, shortest %d; key position A %d / B %d / C %d / D %d"
+        print("  mcq sets: %d; correct answer is longest %d (%.0f%%), middle %d, shortest %d; key position A %d / B %d / C %d / D %d"
               % (n, longest, 100.0 * longest / n, middle, shortest, pos["A"], pos["B"], pos["C"], pos["D"]))
         if longest > 0.4 * n:
             warn("bank", "correct answer is the longest choice in %.0f%% of MCQ items; vary it" % (100.0 * longest / n))

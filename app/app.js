@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  var DATA = {};          // table, bands, items
+  var DATA = {};          // table, bands, items, scenarios, protocol, tiers
   var LAB = {};           // lab name -> master table row
   var PANEL = {};         // panel id -> panel
   var session = null;     // { items: [rendered...], idx, correct, missed: [] }
@@ -101,6 +101,42 @@
     return r;
   }
 
+  // Concrete rendering of a scenario: numbers drawn, every text filled, follow-up shuffled.
+  function renderScenario(sc) {
+    var vals = {};
+    Object.keys(sc.values || {}).forEach(function (k) {
+      vals[k] = drawValue(sc.values[k], { id: sc.id, lab: sc.focus });
+    });
+    var f = function (t) { return fill(t, vals); };
+    var p = sc.patient;
+    var labs = (sc.labs || []).map(function (l) {
+      return { label: f(l.label), value: l.text != null ? f(l.text) : (vals[l.key] ? vals[l.key].text : "") };
+    });
+    var fu = sc.followUp;
+    return {
+      sc: sc,
+      vals: vals,
+      patient: {
+        title: p.age + "-year-old " + p.sex,
+        living: f(p.living),
+        diagnoses: p.diagnoses.map(f),
+        medications: p.medications.map(f),
+        baselines: p.baselines.map(f),
+        social: p.social,
+        goals: f(p.goals)
+      },
+      visit: { reason: f(sc.visit.reason), history: f(sc.visit.history), vitals: f(sc.visit.vitals), exam: f(sc.visit.exam) },
+      labs: labs,
+      rationale: f(sc.rationale),
+      factors: (sc.factors || []).map(f),
+      followUp: {
+        stem: f(fu.stem),
+        rationale: f(fu.rationale),
+        options: shuffle(fu.options.map(function (o) { return { text: f(o.text), correct: !!o.correct }; }))
+      }
+    };
+  }
+
   // Which master-table band does the primary value sit in? Returns {level, disp} or null.
   function primaryBand(item) {
     var vals = item.values || {};
@@ -122,6 +158,7 @@
     return Array.prototype.slice.call(document.querySelectorAll("#panel-choices input:checked")).map(function (i) { return i.value; });
   }
   function selectedLevel() { return document.querySelector("input[name=level]:checked").value; }
+  function selectedMode() { return document.querySelector("input[name=mode]:checked").value; }
   function selectedCount() { return document.querySelector("input[name=count]:checked").value; }
 
   function poolFor(level, panels) {
@@ -146,6 +183,18 @@
   }
 
   function updatePoolNote() {
+    var mode = selectedMode();
+    document.querySelectorAll("#setup-form fieldset[data-mode]").forEach(function (fs) {
+      fs.classList.toggle("hidden", fs.getAttribute("data-mode") !== mode);
+    });
+    if (mode === "B") {
+      var n = DATA.scenarios.length;
+      $("pool-note").textContent = n + " scenarios available.";
+      $("start").disabled = !n;
+      $("start").textContent = "Start scenarios";
+      return;
+    }
+    $("start").textContent = "Start drill";
     var pool = poolFor(selectedLevel(), selectedPanels());
     var f = pool.filter(function (i) { return i.provenance === "field"; }).length;
     $("pool-note").textContent = pool.length
@@ -270,7 +319,175 @@
       box.appendChild(ul);
     }
     $("btn-retry-missed").classList.toggle("hidden", !session.missed.length);
+    bSession = null;
     showView("summary");
+  }
+
+  // ---------- scenario session ----------
+  var bSession = null; // { items: [rendered...], idx, tierCorrect, fuCorrect, answered, missed: [] }
+
+  function startScenarioSession(list) {
+    bSession = { items: list.map(renderScenario), idx: 0, tierCorrect: 0, fuCorrect: 0, answered: 0, missed: [] };
+    showView("scenario");
+    showScenario();
+  }
+
+  function ul(id, arr) {
+    var u = $(id);
+    u.innerHTML = "";
+    arr.forEach(function (t) { u.appendChild(el("li", null, t)); });
+  }
+
+  function showScenario() {
+    var r = bSession.items[bSession.idx];
+    var sc = r.sc;
+    $("sc-progress").style.width = (100 * bSession.idx / bSession.items.length) + "%";
+    $("sc-count").textContent = "Scenario " + (bSession.idx + 1) + " of " + bSession.items.length;
+    $("sc-score").textContent = bSession.answered ? bSession.tierCorrect + " tier" + (bSession.tierCorrect === 1 ? "" : "s") + " correct so far" : "";
+    $("sc-focus").textContent = sc.focus;
+    $("sc-domain").textContent = "domain " + sc.domain;
+
+    $("sc-patient-title").textContent = r.patient.title;
+    $("sc-living").textContent = r.patient.living;
+    ul("sc-dx", r.patient.diagnoses);
+    ul("sc-meds", r.patient.medications);
+    ul("sc-baselines", r.patient.baselines);
+    var dl = $("sc-social");
+    dl.innerHTML = "";
+    [["Transportation", "transport"], ["Support", "support"], ["Adherence", "adherence"], ["Cognition", "cognition"], ["Mobility", "mobility"]].forEach(function (pair) {
+      dl.appendChild(el("dt", null, pair[0]));
+      dl.appendChild(el("dd", null, r.patient.social[pair[1]]));
+    });
+    $("sc-goals").textContent = r.patient.goals;
+
+    $("sc-reason").textContent = r.visit.reason;
+    $("sc-history").textContent = r.visit.history;
+    $("sc-vitals").textContent = r.visit.vitals;
+    $("sc-exam").textContent = r.visit.exam;
+
+    var t = $("sc-labs");
+    t.innerHTML = "";
+    r.labs.forEach(function (l) {
+      var tr = el("tr");
+      tr.appendChild(el("th", null, l.label));
+      tr.appendChild(el("td", null, l.value));
+      t.appendChild(tr);
+    });
+
+    var box = $("sc-tiers");
+    box.innerHTML = "";
+    ["1", "2", "3", "4"].forEach(function (k) {
+      var b = el("button", "option tier");
+      b.type = "button";
+      b.appendChild(el("span", "tier-num", "Tier " + k));
+      b.appendChild(el("span", null, DATA.tiers[k]));
+      b.addEventListener("click", function () { answerTier(k); });
+      box.appendChild(b);
+    });
+    $("sc-feedback").classList.add("hidden");
+    $("sc-followup").classList.add("hidden");
+    $("fu-feedback").classList.add("hidden");
+    window.scrollTo({ top: 0 });
+  }
+
+  function answerTier(k) {
+    var r = bSession.items[bSession.idx];
+    var sc = r.sc;
+    var correct = String(sc.tier) === k;
+    $("sc-tiers").querySelectorAll("button").forEach(function (b, i) {
+      b.disabled = true;
+      var tier = String(i + 1);
+      if (tier === String(sc.tier)) b.classList.add("is-correct");
+      else if (tier === k) b.classList.add("is-wrong");
+    });
+    bSession.answered++;
+    if (correct) bSession.tierCorrect++; else bSession.missed.push(sc);
+
+    var row = LAB[sc.focus];
+    $("sc-verdict").textContent = correct ? "Correct" : "Not quite";
+    $("sc-verdict").className = "verdict " + (correct ? "ok" : "bad");
+    $("sc-answer").textContent = correct ? "" : "Correct disposition: Tier " + sc.tier + " — " + DATA.tiers[String(sc.tier)];
+    $("sc-rationale").textContent = r.rationale;
+    ul("sc-factors", r.factors);
+    $("sc-ref").textContent = row.name + ": " + row.ref + (row.units && row.units !== "—" && row.units !== "qualitative" ? " (" + row.units + ")" : "");
+    $("sc-source").textContent = sc.source || row.source;
+    var dl = $("sc-row");
+    dl.innerHTML = "";
+    [["Baseline note", row.baseline], ["Common causes", row.causes], ["Specimen", row.specimen]].forEach(function (pair) {
+      if (!pair[1]) return;
+      dl.appendChild(el("dt", null, pair[0]));
+      dl.appendChild(el("dd", null, pair[1]));
+    });
+    (row.bands || []).forEach(function (b) {
+      dl.appendChild(el("dt", null, "Band " + b.level + ": " + b.val));
+      dl.appendChild(el("dd", null, b.disp));
+    });
+    $("sc-feedback").classList.remove("hidden");
+
+    // Follow-up question.
+    $("fu-stem").textContent = r.followUp.stem;
+    var fo = $("fu-options");
+    fo.innerHTML = "";
+    r.followUp.options.forEach(function (o, i) {
+      var b = el("button", "option", o.text);
+      b.type = "button";
+      b.addEventListener("click", function () { answerFollowUp(i); });
+      fo.appendChild(b);
+    });
+    $("sc-followup").classList.remove("hidden");
+    $("sc-feedback").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function answerFollowUp(i) {
+    var r = bSession.items[bSession.idx];
+    var chosen = r.followUp.options[i];
+    $("fu-options").querySelectorAll("button").forEach(function (b, j) {
+      b.disabled = true;
+      if (r.followUp.options[j].correct) b.classList.add("is-correct");
+      else if (j === i) b.classList.add("is-wrong");
+    });
+    if (chosen.correct) bSession.fuCorrect++;
+    $("fu-verdict").textContent = chosen.correct ? "Correct" : "Not quite";
+    $("fu-verdict").className = "verdict " + (chosen.correct ? "ok" : "bad");
+    var ct = r.followUp.options.filter(function (o) { return o.correct; })[0].text;
+    $("fu-answer").textContent = chosen.correct ? "" : "Correct answer: " + ct;
+    $("fu-rationale").textContent = r.followUp.rationale;
+    $("fu-feedback").classList.remove("hidden");
+    $("fu-feedback").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function nextScenario() {
+    bSession.idx++;
+    if (bSession.idx >= bSession.items.length) return showScenarioSummary();
+    showScenario();
+  }
+
+  function showScenarioSummary() {
+    var n = bSession.answered;
+    $("summary-score").textContent = n
+      ? bSession.tierCorrect + " of " + n + " dispositions correct; " + bSession.fuCorrect + " of " + n + " follow-ups"
+      : "No scenarios answered";
+    var box = $("summary-missed");
+    box.innerHTML = "";
+    if (bSession.missed.length) {
+      box.appendChild(el("h3", null, "Missed dispositions"));
+      var u = el("ul", "missed");
+      bSession.missed.forEach(function (sc) { u.appendChild(el("li", null, sc.title + " (tier " + sc.tier + ")")); });
+      box.appendChild(u);
+    }
+    $("btn-retry-missed").classList.toggle("hidden", !bSession.missed.length);
+    session = null;
+    showView("summary");
+  }
+
+  function renderProtocol(container) {
+    container.innerHTML = "";
+    DATA.protocol.sections.forEach(function (sec) {
+      container.appendChild(el("h3", null, sec.title));
+      var u = el("ul", "proto");
+      sec.items.forEach(function (t) { u.appendChild(el("li", null, t)); });
+      container.appendChild(u);
+    });
   }
 
   // ---------- table view ----------
@@ -308,7 +525,7 @@
 
   // ---------- navigation ----------
   function showView(name) {
-    ["setup", "drill", "summary", "table", "about"].forEach(function (v) {
+    ["setup", "drill", "scenario", "summary", "table", "about"].forEach(function (v) {
       $("view-" + v).classList.toggle("hidden", v !== name);
     });
     document.querySelectorAll("nav a").forEach(function (a) {
@@ -347,10 +564,21 @@
     syncSelection();
     $("setup-form").addEventListener("submit", function (e) {
       e.preventDefault();
-      var pool = poolFor(selectedLevel(), selectedPanels());
       var c = selectedCount();
+      if (selectedMode() === "B") {
+        var all = shuffle(DATA.scenarios.slice());
+        var m = c === "all" ? all.length : Math.min(parseInt(c, 10), all.length);
+        startScenarioSession(all.slice(0, m));
+        return;
+      }
+      var pool = poolFor(selectedLevel(), selectedPanels());
       var n = c === "all" ? pool.length : Math.min(parseInt(c, 10), pool.length);
       startSession(buildSession(pool, n));
+    });
+    $("sc-next").addEventListener("click", nextScenario);
+    $("sc-quit").addEventListener("click", function () {
+      if (bSession && bSession.answered > 0) return showScenarioSummary();
+      showView("setup");
     });
     $("btn-next").addEventListener("click", next);
     $("btn-quit").addEventListener("click", function () {
@@ -359,7 +587,14 @@
     });
     $("btn-reroll").addEventListener("click", reroll);
     $("btn-again").addEventListener("click", function () { showView("setup"); });
-    $("btn-retry-missed").addEventListener("click", function () { startSession(shuffle(session.missed.slice())); });
+    $("btn-retry-missed").addEventListener("click", function () {
+      if (session) startSession(shuffle(session.missed.slice()));
+      else if (bSession) startScenarioSession(shuffle(bSession.missed.slice()));
+    });
+    renderProtocol($("sc-protocol"));
+    renderProtocol($("about-protocol"));
+    $("protocol-title").textContent = DATA.protocol.name;
+    $("protocol-summary").textContent = DATA.protocol.summary;
     updatePoolNote();
   }
 
@@ -373,11 +608,16 @@
   Promise.all([
     fetchJSON("data/lab-master-table.json"),
     fetchJSON("data/bands.json"),
-    fetchJSON("data/arm-a-items.json")
+    fetchJSON("data/arm-a-items.json"),
+    fetchJSON("data/arm-b-scenarios.json"),
+    fetchJSON("data/protocol.json")
   ]).then(function (res) {
     DATA.table = res[0];
     DATA.bands = res[1];
     DATA.items = res[2].items;
+    DATA.scenarios = res[3].scenarios;
+    DATA.tiers = res[3].tiers;
+    DATA.protocol = res[4];
     DATA.table.labs.forEach(function (l) { LAB[l.name] = l; });
     DATA.table.panels.forEach(function (p) { PANEL[p.id] = p; });
     buildTable();

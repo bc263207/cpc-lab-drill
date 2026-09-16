@@ -59,9 +59,18 @@ def repl_factory(us):
         return us
     return repl
 
+# Prefixes that are converted wherever they occur inside a word (haemoglobin,
+# hypokalaemia, ...). Everything else must match a whole word, so that "enrol"
+# does not rewrite "Enrollment".
+SUBSTRING = {"haem", "aemia", "aemic"}
+
+
 def convert(text):
     for uk, us in PAIRS:
-        text = re.sub(r"(?i)\b" + re.escape(uk), repl_factory(us), text)
+        if uk in SUBSTRING:
+            text = re.sub(r"(?i)" + re.escape(uk), repl_factory(us), text)
+        else:
+            text = re.sub(r"(?i)\b" + re.escape(uk) + r"\b", repl_factory(us), text)
     return text
 
 def main():

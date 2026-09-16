@@ -21,11 +21,19 @@
 
 <main class="wrap" id="main">
   <section id="view-setup" class="view">
-    <h1>Lab value drill</h1>
-    <p class="lede">Classify a lab value as normal, abnormal, or abnormal but baseline for this patient. Values are randomized inside the bands of the course lab table every time. Instant feedback, no score kept, nothing collected.</p>
+    <h1>CP-C practice</h1>
+    <p class="lede">Ungraded drills for the IBSC CP-C exam. Values are randomized inside the bands of the course lab table every time. Instant feedback, no score kept, nothing collected.</p>
 
     <form id="setup-form" class="setup">
       <fieldset>
+        <legend>Mode</legend>
+        <div class="level-grid mode-grid">
+          <label class="level-card mode-a"><input type="radio" name="mode" value="A" checked><b>Lab value drill</b><span>One value at a time. Normal, abnormal, or this patient's baseline.</span></label>
+          <label class="level-card mode-b"><input type="radio" name="mode" value="B"><b>Disposition scenarios</b><span>A patient, a visit, today's labs. Pick the tier, then the next step.</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset data-mode="A">
         <legend>Level</legend>
         <div class="level-grid" id="level-choices">
           <label class="level-card basic"><input type="radio" name="level" value="basic" checked><b>Basic</b><span>Normal or abnormal. Units always shown.</span></label>
@@ -35,7 +43,7 @@
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset data-mode="A">
         <div class="legend-row">
           <legend>Panels</legend>
           <span class="row-actions">
@@ -49,6 +57,7 @@
       <fieldset>
         <legend>Session length</legend>
         <div class="segmented">
+          <label><input type="radio" name="count" value="5"><span>5</span></label>
           <label><input type="radio" name="count" value="10" checked><span>10</span></label>
           <label><input type="radio" name="count" value="20"><span>20</span></label>
           <label><input type="radio" name="count" value="all"><span>All available</span></label>
@@ -100,6 +109,86 @@
     </article>
   </section>
 
+  <section id="view-scenario" class="view hidden">
+    <div class="progress"><div class="bar" id="sc-progress"></div></div>
+    <div class="drill-meta">
+      <span id="sc-count"></span>
+      <span class="drill-right">
+        <span id="sc-score"></span>
+        <button type="button" class="link" id="sc-quit">End session</button>
+      </span>
+    </div>
+
+    <article class="card scenario">
+      <div class="item-head">
+        <span class="chip level scenario-chip">Scenario</span>
+        <span class="chip" id="sc-focus"></span>
+        <span class="chip" id="sc-domain"></span>
+      </div>
+
+      <section class="patient">
+        <h2 id="sc-patient-title"></h2>
+        <p class="muted" id="sc-living"></p>
+        <div class="patient-grid">
+          <div><h3>Diagnoses</h3><ul id="sc-dx"></ul></div>
+          <div><h3>Medications</h3><ul id="sc-meds"></ul></div>
+          <div><h3>Baselines on file</h3><ul id="sc-baselines"></ul></div>
+          <div><h3>Social and functional</h3><dl class="social" id="sc-social"></dl></div>
+        </div>
+        <p class="goals"><b>Goals of care:</b> <span id="sc-goals"></span></p>
+      </section>
+
+      <section class="visit">
+        <h3>Today's visit</h3>
+        <p><b>Reason:</b> <span id="sc-reason"></span></p>
+        <p id="sc-history"></p>
+        <p class="vitals" id="sc-vitals"></p>
+        <p id="sc-exam"></p>
+      </section>
+
+      <section class="labs-today">
+        <h3>Today's results</h3>
+        <table class="labs" id="sc-labs"></table>
+      </section>
+
+      <details class="row-details protocol-details">
+        <summary>Program protocol</summary>
+        <div id="sc-protocol"></div>
+      </details>
+
+      <section class="question">
+        <h3>Disposition</h3>
+        <div class="options tiers" id="sc-tiers"></div>
+        <div class="feedback hidden" id="sc-feedback">
+          <p class="verdict" id="sc-verdict"></p>
+          <p class="correct-answer" id="sc-answer"></p>
+          <div class="fb-block"><h3>Rationale</h3><p id="sc-rationale"></p></div>
+          <div class="fb-block"><h3>What drove the tier</h3><ul id="sc-factors"></ul></div>
+          <div class="fb-block"><h3>Reference range</h3><p id="sc-ref"></p></div>
+          <div class="fb-block"><h3>Source</h3><p id="sc-source"></p></div>
+          <details class="row-details">
+            <summary>Master table row</summary>
+            <dl id="sc-row"></dl>
+          </details>
+        </div>
+      </section>
+
+      <section class="question hidden" id="sc-followup">
+        <h3>Follow-up</h3>
+        <p class="stem" id="fu-stem"></p>
+        <div class="options" id="fu-options"></div>
+        <div class="feedback hidden" id="fu-feedback">
+          <p class="verdict" id="fu-verdict"></p>
+          <p class="correct-answer" id="fu-answer"></p>
+          <div class="fb-block"><h3>Rationale</h3><p id="fu-rationale"></p></div>
+          <div class="fb-actions">
+            <button type="button" class="primary" id="sc-next">Next</button>
+          </div>
+        </div>
+      </section>
+    </article>
+  </section>
+
   <section id="view-summary" class="view hidden">
     <h1>Session complete</h1>
     <div class="card">
@@ -122,7 +211,7 @@
   <section id="view-about" class="view hidden">
     <h1>About</h1>
     <div class="card prose">
-      <p>A practice tool for the IBSC CP-C exam. Arm A, this drill, is the lab layer. Arm B (disposition scenarios) is next.</p>
+      <p>A practice tool for the IBSC CP-C exam. Two arms: the lab value drill (Arm A) and disposition scenarios (Arm B). Both draw their numbers from the same lab table.</p>
       <ul>
         <li><b>Basic</b> asks normal or abnormal. Values are clearly inside or clearly outside the reference range.</li>
         <li><b>Advanced</b> adds the third option, abnormal but this patient's baseline, and covers trend versus snapshot, medication effects on labs, outpatient anticoagulation, BNP interpretation and rule-out logic.</li>
@@ -130,8 +219,12 @@
       </ul>
       <p>Every value is generated inside a band from the lab table and never inside the safety margin around a cutoff, so a number is never one that one laboratory would flag and another would not. Every creatinine, hemoglobin, BNP and troponin comes with a stated baseline. Each session draws roughly 70% field-obtainable values and 30% record-review values.</p>
       <p>Era: the literature cutoff is about 2016 to match the exam. Sepsis-3 lactate threshold, textbook troponin range, digoxin 0.8–2.0, warfarin, PT and aPTT are in; DOACs, SGLT2 inhibitors, high-sensitivity troponin and age-adjusted D-dimer are out.</p>
+      <p><b>Disposition scenarios</b> give a patient card, today's visit and today's results, and ask for one of four tiers: emergent ED transport now; same-day evaluation, non-emergent; PCP or clinic within 24–48 hours; or manage in place with follow-up or care coordination. A lab value is one input among several and is never the deciding factor on its own. Every scenario assumes the program protocol below, then asks one follow-up question on the next step, the reconciliation catch or the coordination action.</p>
       <p>No names, emails or scores are collected or stored.</p>
     </div>
+    <h2 id="protocol-title"></h2>
+    <p class="lede" id="protocol-summary"></p>
+    <div class="card" id="about-protocol"></div>
   </section>
 </main>
 

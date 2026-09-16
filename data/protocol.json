@@ -1,0 +1,60 @@
+{
+  "_about": "The standard program protocol every Arm B scenario assumes. Shown on the About page and available from every scenario. A scenario may state an exception in its visit text.",
+  "name": "Standard community paramedicine program protocol",
+  "summary": "A medical director's standing orders for a community paramedic working alone from a response vehicle, with a provider reachable by phone at all times.",
+  "sections": [
+    {
+      "title": "Provider access",
+      "items": [
+        "A supervising provider is reachable by phone 24 hours a day for consultation and orders.",
+        "A same-day clinic or urgent-care slot can be arranged for any patient seen before mid-afternoon; after that, same-day evaluation means the emergency department.",
+        "A return home visit within 24–48 hours can be scheduled at the paramedic's discretion."
+      ]
+    },
+    {
+      "title": "Point-of-care testing carried",
+      "items": [
+        "i-STAT with CHEM8+ (sodium, potassium, chloride, total CO2, BUN, creatinine, glucose, ionized calcium, hematocrit), CG4+ (blood gas and lactate) and PT/INR cartridges.",
+        "Glucometer, HemoCue hemoglobin, urine dipstick, urine ketone strips, rapid influenza and group A strep antigen tests.",
+        "12-lead ECG with transmission to the supervising provider.",
+        "Venous samples can be drawn for send-out; results return in 24–72 hours."
+      ]
+    },
+    {
+      "title": "The paramedic may, without a call",
+      "items": [
+        "Assess, obtain vitals and point-of-care labs, and document.",
+        "Give oral fluids or oral rehydration solution and assist with a meal.",
+        "Treat hypoglycemia per EMS protocol.",
+        "Assist the patient with medications already prescribed to them, and reconcile the medication list against the record.",
+        "Arrange home health, dietitian, social work, durable equipment or scheduled transport referrals.",
+        "Provide education and teach-back."
+      ]
+    },
+    {
+      "title": "The paramedic may, on a provider's phone order",
+      "items": [
+        "Hold, adjust or restart a prescribed medication (for example a diuretic dose or a warfarin dose per the anticoagulation protocol).",
+        "Give the first dose of an oral antibiotic from the vehicle kit while a prescription is sent to the pharmacy.",
+        "Draw and send additional labs and schedule the recheck."
+      ]
+    },
+    {
+      "title": "The paramedic may not",
+      "items": [
+        "Start, stop or change a prescription on their own authority.",
+        "Give intravenous fluids or intravenous medications except under EMS protocol while awaiting transport.",
+        "Leave a patient at home whose findings meet the program's emergent criteria."
+      ]
+    },
+    {
+      "title": "Disposition tiers",
+      "items": [
+        "Tier 1 — Emergent ED transport now.",
+        "Tier 2 — Same-day evaluation, non-emergent (clinic, urgent care or ED, by scheduled or private transport).",
+        "Tier 3 — PCP or clinic within 24–48 hours.",
+        "Tier 4 — Manage in place with follow-up or care coordination (including a provider phone consult and a return visit)."
+      ]
+    }
+  ]
+}
