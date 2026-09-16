@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CP-C Lab Drill</title>
+<meta name="description" content="Ungraded lab value drill for the IBSC CP-C exam. Normal, abnormal, or abnormal-but-baseline.">
+<link rel="stylesheet" href="app/styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-row">
+    <a class="brand" href="#" data-nav="setup">CP-C Lab Drill</a>
+    <nav>
+      <a href="#" data-nav="setup">Drill</a>
+      <a href="#" data-nav="table">Lab table</a>
+      <a href="#" data-nav="about">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <section id="view-setup" class="view">
+    <h1>Lab value drill</h1>
+    <p class="lede">Classify a lab value as normal, abnormal, or abnormal but baseline for this patient. Values are randomized inside the bands of the course lab table every time. Instant feedback, no score kept, nothing collected.</p>
+
+    <form id="setup-form" class="card">
+      <fieldset>
+        <legend>Level</legend>
+        <div class="choices" id="level-choices">
+          <label><input type="radio" name="level" value="basic" checked> <b>Basic</b><span>normal vs abnormal, units always shown</span></label>
+          <label><input type="radio" name="level" value="advanced"> <b>Advanced</b><span>baseline, trend, medication interactions, anticoagulation, BNP, rule-out logic</span></label>
+          <label><input type="radio" name="level" value="fiendish"> <b>Fiendish</b><span>near-normal values, look-alike labs, specimen and unit traps</span></label>
+          <label><input type="radio" name="level" value="mixed"> <b>Mixed</b><span>everything</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Panels</legend>
+        <div class="choices compact" id="panel-choices"></div>
+        <div class="row-actions">
+          <button type="button" class="link" id="panels-all">All</button>
+          <button type="button" class="link" id="panels-none">None</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Session length</legend>
+        <div class="choices inline">
+          <label><input type="radio" name="count" value="10" checked> 10</label>
+          <label><input type="radio" name="count" value="20"> 20</label>
+          <label><input type="radio" name="count" value="all"> All available</label>
+        </div>
+      </fieldset>
+
+      <p class="muted" id="pool-note"></p>
+      <button type="submit" class="primary" id="start">Start</button>
+    </form>
+  </section>
+
+  <section id="view-drill" class="view hidden">
+    <div class="progress"><div class="bar" id="progress-bar"></div></div>
+    <div class="drill-meta">
+      <span id="drill-count"></span>
+      <span id="drill-score"></span>
+    </div>
+
+    <article class="card item" id="item-card">
+      <div class="item-head">
+        <span class="chip level" id="item-level"></span>
+        <span class="chip" id="item-lab"></span>
+        <span class="chip prov" id="item-prov"></span>
+      </div>
+      <p class="stem" id="item-stem"></p>
+      <p class="baseline" id="item-baseline"></p>
+      <div class="options" id="item-options"></div>
+      <div class="feedback hidden" id="feedback">
+        <p class="verdict" id="fb-verdict"></p>
+        <p class="correct-answer" id="fb-answer"></p>
+        <div class="fb-block"><h3>Rationale</h3><p id="fb-rationale"></p></div>
+        <div class="fb-block"><h3>Reference range</h3><p id="fb-ref"></p></div>
+        <div class="fb-block" id="fb-band-block"><h3>Table band</h3><p id="fb-band"></p></div>
+        <div class="fb-block"><h3>Source</h3><p id="fb-source"></p></div>
+        <details class="row-details">
+          <summary>Master table row</summary>
+          <dl id="fb-row"></dl>
+        </details>
+        <div class="fb-actions">
+          <button type="button" class="secondary" id="btn-reroll">Same item, new values</button>
+          <button type="button" class="primary" id="btn-next">Next</button>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section id="view-summary" class="view hidden">
+    <h1>Session complete</h1>
+    <div class="card">
+      <p class="big" id="summary-score"></p>
+      <p class="muted">Ungraded practice. Nothing was recorded.</p>
+      <div id="summary-missed"></div>
+      <div class="fb-actions">
+        <button type="button" class="secondary hidden" id="btn-retry-missed">Retry missed items</button>
+        <button type="button" class="primary" id="btn-again">New session</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-table" class="view hidden">
+    <h1>Lab master table</h1>
+    <p class="lede">The single source of truth for both arms. Reference ranges follow the course textbook (AAOS <i>Community Health Paramedicine</i>, 2018). Students should cross-check against it.</p>
+    <div id="table-body"></div>
+  </section>
+
+  <section id="view-about" class="view hidden">
+    <h1>About</h1>
+    <div class="card prose">
+      <p>A practice tool for the IBSC CP-C exam. Arm A, this drill, is the lab layer. Arm B (disposition scenarios) is next.</p>
+      <ul>
+        <li><b>Basic</b> asks normal or abnormal. Values are clearly inside or clearly outside the reference range.</li>
+        <li><b>Advanced</b> adds the third option, abnormal but this patient's baseline, and covers trend versus snapshot, medication effects on labs, outpatient anticoagulation, BNP interpretation and rule-out logic.</li>
+        <li><b>Fiendish</b> uses near-normal values, look-alike distractors, specimen-integrity and unit traps, and values that look alarming but change nothing today.</li>
+      </ul>
+      <p>Every value is generated inside a band from the lab table and never inside the safety margin around a cutoff, so a number is never one that one laboratory would flag and another would not. Every creatinine, hemoglobin, BNP and troponin comes with a stated baseline. Each session draws roughly 70% field-obtainable values and 30% record-review values.</p>
+      <p>Era: the literature cutoff is about 2016 to match the exam. Sepsis-3 lactate threshold, textbook troponin range, digoxin 0.8–2.0, warfarin, PT and aPTT are in; DOACs, SGLT2 inhibitors, high-sensitivity troponin and age-adjusted D-dimer are out.</p>
+      <p>No names, emails or scores are collected or stored.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap muted small">Ungraded drill. Reference ranges from the course textbook; where a clinical range differs, the table row says so.</footer>
+
+<script src="app/app.js"></script>
+</body>
+</html>

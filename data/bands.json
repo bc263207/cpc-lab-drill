@@ -1,0 +1,465 @@
+{
+  "_about": [
+    "Numeric transcription of data/lab-master-table.json for the Arm A generator and the pre-deploy validator.",
+    "The master table governs. This file only turns its prose ranges into machine-checkable intervals; if the two disagree, fix this file.",
+    "Each lab has one or more 'sets' (one per unit system or per context, e.g. INR off vs on warfarin, hemoglobin male vs female).",
+    "Per set: units (validation name), suffix (what is rendered after the number), decimals, plausible (hard generation bounds),",
+    "normal (band 0), bands (level 1-3 from the table, plus optional named bands), exclude (safety margins: no generated value may fall here).",
+    "Exclusion zones sit around every reference-range cutoff so that no item ever uses a value that one laboratory would flag and another would not.",
+    "Sets with no 'normal' cannot be used for normal-vs-abnormal classification (amylase/lipase, osmolality, vancomycin, ionized calcium bands).",
+    "Creatinine is 'relative': its level 1-3 bands are ratios of today's value to the stated baseline, exactly as the table defines them."
+  ],
+  "baselineRequired": ["Creatinine", "Hemoglobin", "BNP", "Troponin"],
+  "noItems": {
+    "Chloride": "Table: included for anion gap only; do not build standalone classification items."
+  },
+  "labs": {
+    "Glucose": {
+      "sets": {
+        "mg/dL": {
+          "units": "mg/dL", "suffix": "mg/dL", "decimals": 0, "plausible": [20, 900],
+          "normal": [70, 100],
+          "bands": { "1": [[50, 69], [180, 249]], "2": [[40, 49], [250, 399]], "3": [[20, 39], [401, 900]] },
+          "exclude": [[65, 75], [96, 179]],
+          "note": "Fasting range. 101-179 is excluded entirely because the post-prandial limit (140) makes it ambiguous without timing."
+        },
+        "mmol/L": {
+          "units": "mmol/L", "suffix": "mmol/L", "decimals": 1, "plausible": [1.0, 50.0],
+          "normal": [3.9, 5.6],
+          "bands": { "1": [[2.8, 3.8], [10.0, 13.8]], "2": [[2.2, 2.7], [13.9, 22.2]], "3": [[1.0, 2.1], [22.3, 50.0]] },
+          "exclude": [[3.6, 4.2], [5.3, 9.9]],
+          "note": "mg/dL divided by 18."
+        }
+      }
+    },
+    "Sodium": {
+      "sets": {
+        "default": {
+          "units": "mEq/L", "suffix": "mEq/L", "decimals": 0, "plausible": [105, 175],
+          "normal": [136, 142],
+          "bands": { "1": [[130, 134], [146, 149]], "2": [[125, 129], [150, 155]], "3": [[105, 119], [161, 175]] },
+          "exclude": [[133, 135], [143, 146]],
+          "note": "Textbook range is narrower than most laboratories (135-145), so the margins are wide: 133-135 and 143-146 are never used."
+        }
+      }
+    },
+    "Potassium": {
+      "sets": {
+        "default": {
+          "units": "mEq/L", "suffix": "mEq/L", "decimals": 1, "plausible": [1.5, 9.0],
+          "normal": [3.5, 5.0],
+          "bands": { "1": [[3.0, 3.4], [5.1, 5.5]], "2": [[2.5, 2.9], [5.6, 6.4]], "3": [[1.5, 2.4], [6.6, 9.0]] },
+          "exclude": [[3.3, 3.7], [4.9, 5.3]]
+        }
+      }
+    },
+    "Chloride": {
+      "sets": {
+        "default": {
+          "units": "mEq/L", "suffix": "mEq/L", "decimals": 0, "plausible": [70, 130],
+          "normal": [96, 106],
+          "bands": { "1": [[93, 95], [108, 112]], "2": [[70, 89], [116, 130]] },
+          "exclude": [[94, 98], [104, 109]]
+        }
+      }
+    },
+    "Bicarbonate / total CO2": {
+      "sets": {
+        "default": {
+          "units": "mEq/L", "suffix": "mEq/L", "decimals": 0, "plausible": [5, 50],
+          "normal": [21, 28],
+          "bands": { "1": [[18, 20], [30, 33]], "2": [[15, 17], [34, 38]], "3": [[5, 14]] },
+          "exclude": [[20, 22], [27, 30]],
+          "note": "Table band 1 reads 18-21; 21 belongs to the normal range and is excluded."
+        }
+      }
+    },
+    "BUN": {
+      "sets": {
+        "default": {
+          "units": "mg/dL", "suffix": "mg/dL", "decimals": 0, "plausible": [2, 200],
+          "normal": [8, 23],
+          "bands": { "1": [[24, 35]], "2": [[36, 60]], "3": [[101, 200]] },
+          "exclude": [[6, 9], [21, 26]],
+          "note": "Table band 1 reads 21-35; the overlap with the normal range (21-23) is excluded. 61-100 is not banded by the table and is therefore unusable."
+        }
+      }
+    },
+    "Creatinine": {
+      "relative": true,
+      "sets": {
+        "default": {
+          "units": "mg/dL", "suffix": "mg/dL", "decimals": 2, "plausible": [0.3, 15.0],
+          "normal": [0.6, 1.2],
+          "ratioBands": { "0": [0.75, 1.10], "1": [1.14, 1.22], "2": [1.30, 1.45], "3": [1.60, 10.0] },
+          "exclude": [[0.55, 0.65], [1.15, 1.30], [1.40, 1.55]],
+          "note": "Bands are today/baseline ratios per the table (up to 25%, 25-50%, over 50%). The gaps between ratio bands are the safety margins. Absolute exclusions cover the reference cutoffs and the creatinine-based metformin cutoffs (1.4 women, 1.5 men)."
+        }
+      }
+    },
+    "Calcium — ionized": {
+      "sets": {
+        "total": {
+          "units": "mg/dL", "suffix": "mg/dL (total)", "decimals": 1, "plausible": [4.0, 18.0],
+          "normal": [8.5, 10.5],
+          "bands": { "1": [[8.0, 8.4], [10.6, 11.0]], "2": [[7.0, 7.9], [11.1, 13.0]], "3": [[4.0, 6.9], [13.1, 18.0]] },
+          "exclude": [[8.3, 8.7], [10.3, 10.8]],
+          "note": "The table's bands are written in total calcium (mg/dL)."
+        },
+        "ionized": {
+          "units": "mmol/L", "suffix": "mmol/L (ionized)", "decimals": 2, "plausible": [0.50, 2.00],
+          "normal": [1.12, 1.32],
+          "bands": {},
+          "exclude": [[1.08, 1.16], [1.28, 1.36]],
+          "note": "Normal-only. The table does not band ionized values."
+        }
+      }
+    },
+    "pH": {
+      "sets": {
+        "default": {
+          "units": "pH units", "suffix": "", "decimals": 2, "plausible": [6.80, 7.80],
+          "normal": [7.35, 7.45],
+          "bands": { "1": [[7.32, 7.34], [7.46, 7.48]], "2": [[7.25, 7.31], [7.49, 7.55]], "3": [[6.80, 7.24], [7.56, 7.80]] },
+          "exclude": [[7.34, 7.35], [7.45, 7.46]],
+          "note": "Stems must read 'pH {value}'; nothing is rendered after the number."
+        }
+      }
+    },
+    "pCO2": {
+      "sets": {
+        "default": {
+          "units": "mmHg", "suffix": "mmHg", "decimals": 0, "plausible": [15, 120],
+          "normal": [35, 45],
+          "bands": { "1": [[30, 34], [46, 50]], "2": [[51, 60]], "3": [[61, 120]] },
+          "exclude": [[33, 36], [44, 47]]
+        }
+      }
+    },
+    "Lactate": {
+      "sets": {
+        "mg/dL": {
+          "units": "mg/dL", "suffix": "mg/dL", "decimals": 0, "plausible": [2, 150],
+          "normal": [5, 15],
+          "bands": { "1": [[16, 25]], "2": [[26, 35]], "3": [[36, 150]] },
+          "exclude": [[14, 17], [34, 37]],
+          "note": "Course textbook units."
+        },
+        "mmol/L": {
+          "units": "mmol/L", "suffix": "mmol/L", "decimals": 1, "plausible": [0.2, 16.0],
+          "normal": [0.6, 1.7],
+          "bands": { "1": [[1.8, 2.8]], "2": [[2.9, 3.9]], "3": [[4.0, 16.0]] },
+          "exclude": [[1.6, 1.9], [3.8, 4.1]],
+          "note": "Sepsis-3 units. mg/dL divided by 9.01. The 4.0 threshold stands; 3.8-4.1 is excluded so no item hugs it."
+        }
+      }
+    },
+    "Hemoglobin": {
+      "sets": {
+        "male": {
+          "units": "g/dL", "suffix": "g/dL", "decimals": 1, "plausible": [3.0, 22.0],
+          "normal": [14.0, 18.0],
+          "bands": { "1": [[10.0, 11.9]], "2": [[7.0, 9.9]], "3": [[3.0, 6.9]] },
+          "exclude": [[13.0, 14.4], [17.7, 18.3]],
+          "note": "12.0-13.9 is below the textbook male range but not in any band; unusable."
+        },
+        "female": {
+          "units": "g/dL", "suffix": "g/dL", "decimals": 1, "plausible": [3.0, 22.0],
+          "normal": [12.0, 16.0],
+          "bands": { "1": [[10.0, 11.9]], "2": [[7.0, 9.9]], "3": [[3.0, 6.9]] },
+          "exclude": [[11.5, 12.4], [15.7, 16.3]]
+        }
+      }
+    },
+    "White blood cell count": {
+      "sets": {
+        "default": {
+          "units": "×10⁹/L", "suffix": "×10⁹/L", "decimals": 1, "plausible": [0.1, 100.0],
+          "normal": [4.5, 11.0],
+          "bands": { "1": [[3.5, 4.4], [11.1, 15.0]], "2": [[1.0, 3.4], [15.1, 30.0]], "3": [[0.1, 0.9], [30.1, 100.0]] },
+          "exclude": [[4.2, 4.8], [10.6, 11.6]]
+        },
+        "cells/µL": {
+          "units": "cells/µL", "suffix": "/µL", "nospace": true, "decimals": 0, "plausible": [100, 100000],
+          "normal": [4500, 11000],
+          "bands": { "1": [[3500, 4400], [11100, 15000]], "2": [[1000, 3400], [15100, 30000]], "3": [[100, 900], [30100, 100000]] },
+          "exclude": [[4200, 4800], [10600, 11600]],
+          "note": "Textbook notation. Unit-trap set."
+        }
+      }
+    },
+    "Platelet count": {
+      "sets": {
+        "default": {
+          "units": "×10⁹/L", "suffix": "×10⁹/L", "decimals": 0, "plausible": [2, 1500],
+          "normal": [150, 350],
+          "bands": { "1": [[100, 149]], "2": [[50, 99], [601, 1500]], "3": [[2, 49]] },
+          "exclude": [[140, 160], [340, 620]],
+          "note": "Band 3 for 20-49 requires active bleeding in the stem. 351-600 is not banded by the table."
+        }
+      }
+    },
+    "INR": {
+      "sets": {
+        "off": {
+          "units": "ratio", "suffix": "", "decimals": 1, "plausible": [0.5, 15.0],
+          "normal": [0.8, 1.1],
+          "bands": { "liver": [[1.4, 2.4]] },
+          "exclude": [[1.2, 1.3]],
+          "note": "Off anticoagulation. 'liver' is a named zone used only by the liver-enzyme row's cirrhosis coagulopathy teaching point; it carries no transport disposition."
+        },
+        "warfarin": {
+          "units": "ratio", "suffix": "", "decimals": 1, "plausible": [0.5, 15.0],
+          "normal": [2.0, 3.0],
+          "bands": { "1": [[1.5, 1.9], [3.1, 3.5]], "2": [[4.5, 9.0]], "3": [[9.1, 15.0]] },
+          "exclude": [[1.9, 2.1], [2.9, 3.2], [3.6, 4.4]],
+          "note": "Textbook target 2.0-3.0. 3.6-4.4 is a gap in the table's bands and is excluded. Stems must read 'INR {value}'."
+        }
+      }
+    },
+    "Warfarin — dietary and drug influences on the INR": {
+      "qualitative": true,
+      "sets": {},
+      "note": "Quote INR values through the INR lab's sets (value.lab = 'INR')."
+    },
+    "aPTT": {
+      "sets": {
+        "default": {
+          "units": "seconds", "suffix": "s", "decimals": 0, "plausible": [15, 200],
+          "normal": [25, 40],
+          "bands": { "1": [[41, 45]], "2": [[46, 70]], "3": [[71, 200]] },
+          "exclude": [[23, 27], [38, 43]],
+          "note": "Table band 1 reads 36-45; the overlap with the normal range is excluded."
+        }
+      }
+    },
+    "D-dimer": {
+      "sets": {
+        "default": {
+          "units": "ng/mL FEU", "suffix": "ng/mL FEU", "decimals": 0, "plausible": [50, 20000],
+          "normal": [50, 449],
+          "bands": { "1": [[50, 449]], "2": [[500, 20000]], "3": [[50, 20000]] },
+          "exclude": [[420, 580]],
+          "note": "Band 1 is a negative result with low or moderate pretest probability. Band 3 is any value with high pretest probability, so it admits any value; the stem must carry the pretest features."
+        }
+      }
+    },
+    "BNP": {
+      "sets": {
+        "default": {
+          "units": "pg/mL", "suffix": "pg/mL", "decimals": 0, "plausible": [5, 5000],
+          "normal": [5, 199],
+          "bands": { "1": [[200, 400]], "2": [[401, 5000]], "3": [[5, 5000]] },
+          "exclude": [[180, 220], [385, 420]],
+          "note": "Band 3 is clinical (hypoxia, orthopnea, hypotension, arrhythmia) and admits any value."
+        }
+      }
+    },
+    "Ketones — urine": { "qualitative": true, "sets": {} },
+    "Urine dipstick": { "qualitative": true, "sets": {} },
+    "Rapid antigen testing — influenza and group A strep": { "qualitative": true, "sets": {} },
+    "eGFR": {
+      "sets": {
+        "default": {
+          "units": "mL/min/1.73m²", "suffix": "mL/min/1.73m²", "decimals": 0, "plausible": [2, 150],
+          "normal": [90, 150],
+          "bands": { "1": [[45, 59]], "2": [[30, 44]], "3": [[2, 14]] },
+          "exclude": [[57, 62], [85, 95]],
+          "note": "60-89 and 15-29 are not banded by the table and are unusable."
+        }
+      }
+    },
+    "Magnesium": {
+      "sets": {
+        "default": {
+          "units": "mg/dL", "suffix": "mg/dL", "decimals": 1, "plausible": [0.2, 5.0],
+          "normal": [1.7, 2.2],
+          "bands": { "1": [[1.5, 1.6]], "2": [[1.0, 1.4]], "3": [[0.2, 0.9]] },
+          "exclude": [[1.4, 1.8], [2.2, 2.5]],
+          "note": "Laboratory lower limits range from 1.5 to 1.8, so band 1 is inside the margin and effectively unusable; near-normal items are not possible on this analyte."
+        }
+      }
+    },
+    "Phosphate": {
+      "sets": {
+        "default": {
+          "units": "mg/dL", "suffix": "mg/dL", "decimals": 1, "plausible": [0.2, 12.0],
+          "normal": [2.5, 4.5],
+          "bands": { "1": [[2.0, 2.4], [4.6, 5.5]], "2": [[1.0, 1.9], [5.6, 7.0]], "3": [[0.2, 0.9]] },
+          "exclude": [[2.3, 2.7], [4.3, 4.8]]
+        }
+      }
+    },
+    "Albumin": {
+      "sets": {
+        "default": {
+          "units": "g/dL", "suffix": "g/dL", "decimals": 1, "plausible": [0.8, 6.0],
+          "normal": [3.5, 5.0],
+          "bands": { "1": [[3.0, 3.4]], "2": [[2.5, 2.9]], "3": [[0.8, 2.4]] },
+          "exclude": [[3.3, 3.7]]
+        }
+      }
+    },
+    "Liver enzymes, alkaline phosphatase and bilirubin": {
+      "sets": {
+        "ALT": {
+          "units": "U/L", "suffix": "U/L", "decimals": 0, "plausible": [3, 5000],
+          "normal": [10, 40],
+          "bands": { "1": [[41, 120]], "2": [[121, 400]], "3": [[401, 5000]] },
+          "exclude": [[36, 60], [110, 130], [380, 420]],
+          "note": "Bands are multiples of the textbook upper limit (3x, 10x). Laboratory ALT upper limits run to 55-65, hence the wide first margin."
+        },
+        "AST": {
+          "units": "U/L", "suffix": "U/L", "decimals": 0, "plausible": [3, 5000],
+          "normal": [10, 30],
+          "bands": { "1": [[31, 90]], "2": [[91, 300]], "3": [[301, 5000]] },
+          "exclude": [[27, 50], [85, 95], [290, 310]]
+        },
+        "ALP": {
+          "units": "U/L", "suffix": "U/L", "decimals": 0, "plausible": [10, 5000],
+          "normal": [30, 120],
+          "bands": { "1": [[121, 360]], "2": [[361, 1200]], "3": [[1201, 5000]] },
+          "exclude": [[110, 140], [350, 372], [1180, 1220]]
+        },
+        "bilirubin": {
+          "units": "mg/dL", "suffix": "mg/dL", "decimals": 1, "plausible": [0.1, 40.0],
+          "normal": [0.2, 1.2],
+          "bands": { "1": [[1.3, 3.6]], "2": [[3.7, 12.0]], "3": [[12.1, 40.0]] },
+          "exclude": [[1.1, 1.5], [3.5, 3.9], [11.8, 12.4]],
+          "note": "Total bilirubin only. Split bilirubin is rejected by the era boundary."
+        }
+      }
+    },
+    "Ammonia": {
+      "sets": {
+        "default": {
+          "units": "µg/dL", "suffix": "µg/dL", "decimals": 0, "plausible": [5, 600],
+          "normal": [15, 45],
+          "bands": { "1": [[46, 80]], "2": [[81, 150]], "3": [[151, 600]] },
+          "exclude": [[40, 60], [78, 84], [148, 154]],
+          "note": "Laboratory upper limits vary widely (45-70), hence the wide first margin. Band 3 is clinical and admits any value with the stated features; 151+ is the numeric part."
+        }
+      }
+    },
+    "Hematinics — ferritin, B12, vitamin D": {
+      "sets": {
+        "ferritin": {
+          "units": "ng/mL", "suffix": "ng/mL", "decimals": 0, "plausible": [1, 5000],
+          "normal": [30, 400],
+          "bands": { "1": [[5, 24], [440, 5000]] },
+          "exclude": [[25, 36], [380, 440]]
+        },
+        "B12": {
+          "units": "pg/mL", "suffix": "pg/mL", "decimals": 0, "plausible": [30, 3000],
+          "normal": [200, 900],
+          "bands": { "1": [[30, 159]], "2": [[30, 159]] },
+          "exclude": [[160, 250], [880, 950]],
+          "note": "Band 2 is the same interval with neuropathy or cognitive change in the stem."
+        },
+        "vitD": {
+          "units": "ng/mL", "suffix": "ng/mL", "decimals": 0, "plausible": [2, 200],
+          "normal": [30, 100],
+          "bands": { "1": [[2, 24]] },
+          "exclude": [[25, 34], [96, 106]]
+        }
+      }
+    },
+    "Troponin": {
+      "sets": {
+        "default": {
+          "units": "ng/mL", "suffix": "ng/mL", "decimals": 2, "plausible": [0.0, 50.0],
+          "normal": [0.0, 0.02],
+          "bands": { "1": [[0.5, 50.0]], "2": [[0.5, 0.9]], "3": [[0.5, 50.0]] },
+          "exclude": [[0.03, 0.49]],
+          "note": "Settled decision: normal items at or below 0.02, abnormal at or above 0.5, nothing between 0.04 and 0.4 (textbook 0.4 vs conventional troponin I 0.04). Band 1 = historical peak on a discharge summary; band 2 = mildly elevated stable value in CKD/HF; band 3 = new elevation today with symptoms."
+        }
+      }
+    },
+    "HbA1c": {
+      "sets": {
+        "default": {
+          "units": "%", "suffix": "%", "nospace": true, "decimals": 1, "plausible": [3.5, 20.0],
+          "normal": [4.0, 5.4],
+          "bands": { "pre": [[5.9, 6.2]], "dm": [[6.7, 7.2]], "1": [[7.5, 9.6]], "2": [[10.3, 20.0]] },
+          "exclude": [[5.5, 5.8], [6.3, 6.6], [7.3, 7.4], [9.7, 10.2]],
+          "note": "Named zones: 'pre' = prediabetes 5.7-6.4, 'dm' = diagnostic range at a common target. Band 1 = above an individualized target (typical target under 7). No band 3: the table says an HbA1c never generates an emergency."
+        }
+      }
+    },
+    "TSH": {
+      "sets": {
+        "default": {
+          "units": "mIU/L", "suffix": "mIU/L", "decimals": 2, "plausible": [0.005, 150.0],
+          "normal": [0.4, 4.0],
+          "bands": { "1": [[4.4, 9.5]], "2": [[0.005, 0.09], [10.5, 150.0]], "3": [[0.005, 150.0]] },
+          "exclude": [[0.1, 0.5], [3.7, 4.39], [9.51, 10.49]],
+          "note": "Band 3 is clinical (myxedema coma / thyroid storm features) and admits any value."
+        }
+      }
+    },
+    "Urine culture": { "qualitative": true, "sets": {} },
+    "Pending cultures and outstanding results at discharge": { "qualitative": true, "sets": {} },
+    "Therapeutic drug levels — digoxin, vancomycin": {
+      "sets": {
+        "digoxin": {
+          "units": "ng/mL", "suffix": "ng/mL", "decimals": 1, "plausible": [0.1, 10.0],
+          "normal": [0.8, 2.0],
+          "bands": { "1": [[2.1, 2.5]], "2": [[2.6, 3.5]], "3": [[3.6, 10.0]] },
+          "exclude": [[0.6, 0.9], [1.9, 2.2]],
+          "note": "Era conflict noted in the table: 0.8-2.0 is the exam range; current HF practice targets 0.5-0.9. Items classify against the exam range."
+        },
+        "vancomycin": {
+          "units": "mg/L", "suffix": "mg/L", "decimals": 0, "plausible": [1, 80],
+          "normal": [10, 20],
+          "bands": {},
+          "exclude": [[8, 11], [19, 23]],
+          "note": "Trough. Normal-only; the table gives no bands."
+        }
+      }
+    },
+    "Red blood cell count": {
+      "sets": {
+        "default": {
+          "units": "×10¹²/L", "suffix": "×10¹²/L", "decimals": 2, "plausible": [1.0, 8.0],
+          "normal": [3.9, 5.5],
+          "bands": { "1": [[3.2, 3.7]], "2": [[2.5, 3.7]] },
+          "exclude": [[3.71, 4.1], [5.3, 5.7]],
+          "note": "Band 1 = mildly low with a matching hemoglobin; band 2 = low with a disproportionately low hemoglobin. One item only, per the table."
+        }
+      }
+    },
+    "Prothrombin time": {
+      "sets": {
+        "default": {
+          "units": "seconds", "suffix": "s", "decimals": 0, "plausible": [7, 120],
+          "normal": [10, 12],
+          "bands": { "1": [[15, 17]], "2": [[18, 25]], "3": [[26, 120]] },
+          "exclude": [[8, 9], [13, 14]],
+          "note": "Textbook 10-13; 13-14 excluded as the margin."
+        }
+      }
+    },
+    "Creatine kinase": {
+      "sets": {
+        "default": {
+          "units": "U/L", "suffix": "U/L", "decimals": 0, "plausible": [10, 200000],
+          "normal": [40, 150],
+          "bands": { "1": [[151, 500]], "2": [[501, 5000]], "3": [[5001, 200000]] },
+          "exclude": [[135, 319], [480, 530], [4800, 5300]],
+          "note": "Laboratory upper limits for men run to 300+, hence the wide first margin: band 1 is usable only from 320."
+        }
+      }
+    },
+    "Amylase and lipase": {
+      "sets": {
+        "amylase": { "units": "U/L", "suffix": "U/L", "decimals": 0, "plausible": [10, 5000], "bands": {}, "exclude": [], "note": "No textbook range; classification items are forbidden by the table. Trend items only." },
+        "lipase": { "units": "U/L", "suffix": "U/L", "decimals": 0, "plausible": [10, 10000], "bands": {}, "exclude": [], "note": "As amylase." }
+      }
+    },
+    "Serum osmolality": {
+      "sets": {
+        "default": { "units": "mOsm/kg", "suffix": "mOsm/kg", "decimals": 0, "plausible": [240, 420], "bands": {}, "exclude": [], "note": "Conceptual on this course; no classification items." }
+      }
+    }
+  }
+}

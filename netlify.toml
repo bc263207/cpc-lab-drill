@@ -1,0 +1,11 @@
+# Static site. The only build step is validation: if any item breaks a rule in
+# CLAUDE.md the command exits non-zero and Netlify refuses to deploy.
+[build]
+  command = "python3 scripts/validate.py"
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"

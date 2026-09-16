@@ -1,0 +1,1296 @@
+{
+  "panels": [
+    {
+      "id": "glucose",
+      "name": "Glucose and ketones",
+      "device": "Glucometer — near-universal; capillary sample. Ketones by urine dipstick. Scenarios use urine ketones only; blood ketone meters appear only as fiendish-level drill content"
+    },
+    {
+      "id": "bmp",
+      "name": "Metabolic panel — basic and extended",
+      "device": "i-STAT CHEM8+ covers sodium, potassium, chloride, total CO2, BUN, creatinine, glucose, ionized calcium and hematocrit. eGFR, magnesium, phosphate and albumin come from the record or a send-out"
+    },
+    {
+      "id": "abg",
+      "name": "Arterial / venous blood gas",
+      "device": "i-STAT CG4+ cartridge — pH, pCO2, pO2, HCO3, base excess, lactate"
+    },
+    {
+      "id": "cbc",
+      "name": "Complete blood count",
+      "device": "HemoCue for hemoglobin; a differential generally requires a reference lab, so treat white cell count and platelets as send-out or record values"
+    },
+    {
+      "id": "coag",
+      "name": "Coagulation studies",
+      "device": "i-STAT PT/INR cartridge; dedicated INR meters. aPTT is not reliably available at point of care"
+    },
+    {
+      "id": "ddimer",
+      "name": "D-dimer",
+      "device": "Not available on i-STAT. Requires a dedicated platform or a send-out"
+    },
+    {
+      "id": "cardiac",
+      "name": "Cardiac markers",
+      "device": "i-STAT BNP and troponin cartridges exist, but troponin in this bank is usually a discharge-summary value"
+    },
+    {
+      "id": "endo",
+      "name": "Glycemic control and endocrine",
+      "device": "POC HbA1c analyzers exist but are uncommon in the field. Treat these as record values"
+    },
+    {
+      "id": "hepatic",
+      "name": "Hepatic and nutritional markers",
+      "device": "Record review or send-out. None of these are point-of-care"
+    },
+    {
+      "id": "urine",
+      "name": "Urine studies",
+      "device": "Dipstick is field-obtainable and carried routinely. Culture is a send-out or a record value"
+    },
+    {
+      "id": "micro",
+      "name": "Microbiology and rapid testing",
+      "device": "Rapid antigen tests are field-obtainable. Cultures are record values"
+    },
+    {
+      "id": "enzymes",
+      "name": "Muscle and pancreatic enzymes",
+      "device": "Record review or send-out"
+    },
+    {
+      "id": "drug",
+      "name": "Therapeutic drug levels",
+      "device": "Record review only"
+    }
+  ],
+  "labs": [
+    {
+      "panel": "glucose",
+      "name": "Glucose",
+      "units": "mg/dL",
+      "si": "mmol/L (÷18)",
+      "ref": "70–100 fasting (course textbook); under 140 two hours post-prandial",
+      "variants": "No meaningful sex difference. Neonatal and pregnancy thresholds differ and are out of scope for this bank.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "50–69 or 180–249",
+          "disp": "Treat and recheck. Hypoglycemia in a patient who eats and has a caregiver present is a leave-at-home event once corrected and a meal is taken. Sustained hyperglycemia in this range is a medication-adherence conversation, not a transport."
+        },
+        {
+          "level": 2,
+          "val": "Under 50, or 250–399 without ketones",
+          "disp": "Provider consult. Repeated hypoglycemia points to a dosing error, a missed meal pattern or renal decline — the drug regimen needs changing, which the CP cannot do alone."
+        },
+        {
+          "level": 3,
+          "val": "Under 40, or over 400, or any hyperglycemia with ketones, Kussmaul respirations or altered mentation",
+          "disp": "Emergent transport. This is DKA or HHS territory."
+        }
+      ],
+      "causes": "Insulin or sulfonylurea dosing errors, missed meals, acute illness raising requirements, declining renal function prolonging insulin half-life, steroid courses, new or worsening infection.",
+      "baseline": "A long-standing type 2 diabetic running 230–280 all day has poor control, not an emergency. Medics routinely over-transport this patient. Conversely a well-controlled patient who suddenly runs 300 has a new problem — usually infection — and the number matters less than the change.",
+      "specimen": "Capillary readings are unreliable in shock, marked peripheral edema and severe anemia. In a gray-zone decision, confirm on a venous sample. Glucose falls roughly 5–7% per hour in a tube without a glycolytic inhibitor, so a send-out drawn at the house and driven in will read falsely low.",
+      "source": "ADA Standards of Care, current edition; device package insert for POC cutoffs"
+    },
+    {
+      "panel": "bmp",
+      "name": "Sodium",
+      "units": "mEq/L",
+      "si": "mmol/L (1:1)",
+      "ref": "136–142 (course textbook)",
+      "variants": "Stable across adult age and sex. Note the textbook range is narrower at both ends than most published intervals, so a sodium of 134 or 144 counts as abnormal on this course and would read as normal against many laboratory reports.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "130–134 or 146–149",
+          "disp": "Document and trend. If this matches the patient's known baseline, no action beyond the next scheduled visit."
+        },
+        {
+          "level": 2,
+          "val": "125–129 or 150–155",
+          "disp": "Provider consult, same day. Review diuretics, recent free-water intake and any new SSRI or carbamazepine."
+        },
+        {
+          "level": 3,
+          "val": "Under 120 or over 160, or any level with seizure, marked confusion or focal deficit",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Thiazides, SIADH, CHF with dilutional hyponatremia, psychogenic polydipsia, poor oral intake in a frail elderly patient, SSRIs, tea-and-toast diets.",
+      "baseline": "The single most important teaching point on this analyte is that rate of change outranks the absolute number. A CHF patient stable at 128 for two years tolerates it; a patient who moved from 140 to 128 in four days is in trouble at the same value. Correcting chronic hyponatremia quickly risks osmotic demyelination, which is why the answer to a stable 128 is never a fluid bolus.",
+      "specimen": "Marked hyperglycemia and severe hyperlipidemia cause pseudohyponatremia. Drawing above a running IV dilutes the sample.",
+      "source": "Tietz-typical adult reference intervals; critical thresholds vary by laboratory"
+    },
+    {
+      "panel": "bmp",
+      "name": "Potassium",
+      "units": "mEq/L",
+      "si": "mmol/L (1:1)",
+      "ref": "3.5–5.0",
+      "variants": "Slightly higher in neonates. Chronic kidney disease shifts the tolerable ceiling upward.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "3.0–3.4 or 5.1–5.5",
+          "disp": "Provider consult on timing. Diuretic and supplement adjustment; recheck interval set by the provider."
+        },
+        {
+          "level": 2,
+          "val": "2.5–2.9 or 5.6–6.4",
+          "disp": "Urgent same-day evaluation. Needs an ECG. Hyperkalemia in this band with a widening QRS or peaked T waves escalates immediately."
+        },
+        {
+          "level": 3,
+          "val": "Under 2.5 or over 6.5, or any level with ECG change",
+          "disp": "Emergent transport with cardiac monitoring."
+        }
+      ],
+      "causes": "Low: loop and thiazide diuretics, GI losses, poor intake. High: ACE inhibitors, ARBs, spironolactone, NSAIDs, potassium supplements, declining GFR, and in particular any two of those together.",
+      "baseline": "A dialysis patient at 5.4 on a non-dialysis day is expected. Medics trained on acute hyperkalemia read 5.4 as a crisis. The dangerous version is the CKD patient recently started on spironolactone or an ARB, where the number climbs over days.",
+      "specimen": "This is the highest-yield specimen-integrity item in the whole bank. Hemolysis from a small-gauge needle, excessive tourniquet time, fist clenching or a rough transport falsely elevates potassium, sometimes by more than 1 mEq/L. A surprise hyperkalemia in a well-looking patient should be redrawn before anyone acts on it.",
+      "source": "Tietz-typical adult reference intervals; KDIGO for the CKD context"
+    },
+    {
+      "panel": "bmp",
+      "name": "Chloride",
+      "units": "mEq/L",
+      "si": "mmol/L (1:1)",
+      "ref": "96–106 (course textbook)",
+      "variants": "None material.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "93–97 or 108–112",
+          "disp": "Rarely actionable alone. Use it to compute the anion gap."
+        },
+        {
+          "level": 2,
+          "val": "Outside 90–115",
+          "disp": "Interpret with sodium, bicarbonate and the anion gap rather than in isolation."
+        },
+        {
+          "level": 3,
+          "val": "Not a standalone critical value",
+          "disp": "Escalation is driven by the acid-base picture, not by chloride."
+        }
+      ],
+      "causes": "Vomiting and nasogastric suction lower it; saline loading and renal tubular acidosis raise it.",
+      "baseline": "Included for anion gap calculation only. Do not build standalone classification items on chloride — it teaches nothing and pads the bank.",
+      "specimen": "No special handling.",
+      "source": "Tietz-typical adult reference intervals"
+    },
+    {
+      "panel": "bmp",
+      "name": "Bicarbonate / total CO2",
+      "units": "mEq/L",
+      "si": "mmol/L (1:1)",
+      "ref": "21–28 bicarbonate (course textbook)",
+      "variants": "Chronically elevated in compensated respiratory acidosis.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "18–21 or 30–33",
+          "disp": "Document and trend against baseline."
+        },
+        {
+          "level": 2,
+          "val": "15–17 or 34–38",
+          "disp": "Provider consult. A falling bicarbonate is the earliest numeric sign of an evolving metabolic acidosis and often precedes any vital-sign change."
+        },
+        {
+          "level": 3,
+          "val": "Under 15",
+          "disp": "Urgent or emergent depending on the gap and the clinical picture. Pair with lactate."
+        }
+      ],
+      "causes": "Low: DKA, lactic acidosis, renal failure, severe diarrhea. High: chronic CO2 retention, aggressive loop diuresis (contraction alkalosis), prolonged vomiting.",
+      "baseline": "A COPD patient with a bicarbonate of 32 is not alkalotic — that is renal compensation for chronic hypercapnia, and it is the correct value for him. Reading it as a primary abnormality is a common error.",
+      "specimen": "Total CO2 drifts down in a tube left open to air.",
+      "source": "Tietz-typical adult reference intervals"
+    },
+    {
+      "panel": "bmp",
+      "name": "BUN",
+      "units": "mg/dL",
+      "si": "mmol/L urea (÷2.8)",
+      "ref": "8–23 (course textbook)",
+      "variants": "Rises with age and with high protein intake. Lower in advanced liver disease.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "21–35",
+          "disp": "Interpret with creatinine as a ratio, never alone."
+        },
+        {
+          "level": 2,
+          "val": "36–60",
+          "disp": "Provider consult if new or rising from baseline."
+        },
+        {
+          "level": 3,
+          "val": "Over 100 with uremic signs",
+          "disp": "Urgent evaluation."
+        }
+      ],
+      "causes": "Dehydration, GI bleeding, high protein load, steroids, declining renal function, heart failure with poor forward flow.",
+      "baseline": "The ratio is the teaching point. A BUN-to-creatinine ratio above 20 to 1 points to a pre-renal cause — most often simple dehydration in a frail patient who has stopped drinking, which is frequently correctable at home with oral rehydration and a follow-up visit rather than an ED trip. Medics have no framework for this ratio at all.",
+      "specimen": "No special handling.",
+      "source": "Tietz-typical adult reference intervals"
+    },
+    {
+      "panel": "bmp",
+      "name": "Creatinine",
+      "units": "mg/dL",
+      "si": "µmol/L (×88.4)",
+      "ref": "0.6–1.2, no sex split in the course textbook",
+      "variants": "Strongly dependent on muscle mass. A frail 85-year-old with a creatinine of 1.0 may have a substantially reduced GFR. Amputees and cachectic patients read falsely reassuring.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Up to 25% above the patient's documented baseline",
+          "disp": "Expected variation or an anticipated medication effect. Trend it."
+        },
+        {
+          "level": 2,
+          "val": "25–50% above baseline, or an absolute rise over 0.3 mg/dL in 48 hours",
+          "disp": "Provider consult — this meets an acute kidney injury definition. Review NSAIDs, diuretic dose and hydration."
+        },
+        {
+          "level": 3,
+          "val": "Over 50% above baseline, or oliguria, or hyperkalemia with it",
+          "disp": "Urgent or emergent evaluation."
+        }
+      ],
+      "causes": "Volume depletion, NSAIDs, contrast exposure, ACE inhibitors and ARBs, obstruction, progression of underlying CKD.",
+      "baseline": "Nothing in this table is more baseline-dependent. A creatinine of 2.1 is alarming in someone whose baseline is 0.9 and unremarkable in stage 4 CKD whose baseline is 2.0. A question that gives a creatinine without a baseline has no correct answer, and writing items that way is the fastest route to a bank students stop trusting. Also worth an item of its own: a rise of up to 30% after starting an ACE inhibitor is expected and is not a reason to stop the drug.",
+      "specimen": "No special handling.",
+      "source": "KDIGO AKI criteria; Tietz-typical adult reference intervals"
+    },
+    {
+      "panel": "bmp",
+      "name": "Calcium — ionized",
+      "units": "mmol/L",
+      "si": "Total Ca in mg/dL is a separate measurement",
+      "ref": "1.12–1.32 ionized; 8.5–10.5 mg/dL total",
+      "variants": "Total calcium requires albumin correction; ionized does not, which is why the POC value is the more useful one.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Total 8.0–8.4 or 10.6–11.0",
+          "disp": "Correct for albumin before interpreting. Trend."
+        },
+        {
+          "level": 2,
+          "val": "Total 7.0–7.9 or 11.1–13.0",
+          "disp": "Provider consult. Review calcium and vitamin D supplements, thiazides and any malignancy history."
+        },
+        {
+          "level": 3,
+          "val": "Total under 7.0 or over 13.0, or tetany, or seizure",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Low: CKD, vitamin D deficiency, post-thyroidectomy, loop diuretics. High: malignancy, hyperparathyroidism, immobility, thiazides, excess supplementation.",
+      "baseline": "Hypercalcemia of malignancy is the case a CP is most likely to meet, often in an oncology patient at home who has become confused and constipated. It is easy to attribute to progression of disease rather than to a correctable number.",
+      "specimen": "Corrected total calcium adds 0.8 mg/dL for every 1 g/dL the albumin sits below 4.0.",
+      "source": "Tietz-typical adult reference intervals"
+    },
+    {
+      "panel": "abg",
+      "name": "pH",
+      "units": "—",
+      "si": "—",
+      "ref": "7.35–7.45",
+      "variants": "None material in adults.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "7.32–7.34 or 7.46–7.48",
+          "disp": "Interpret with pCO2 and bicarbonate. In a known retainer this may be baseline."
+        },
+        {
+          "level": 2,
+          "val": "7.25–7.31 or 7.49–7.55",
+          "disp": "Urgent evaluation unless it matches a documented baseline."
+        },
+        {
+          "level": 3,
+          "val": "Under 7.25 or over 7.55",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Respiratory or metabolic, primary or compensatory. The full four-step interpretation is required.",
+      "baseline": "The flagship case of the whole bank. A COPD retainer with a pH of 7.36, pCO2 of 58 and bicarbonate of 32 is fully compensated and this is his normal. A medic looks at that gas and wants to assist ventilation. The pathological version is acute-on-chronic: a pH below 7.30 with a rising pCO2 and a bicarbonate that has not had time to climb.",
+      "specimen": "Air bubbles in the syringe raise pO2 and lower pCO2. Delay at room temperature drifts the sample. i-STAT cartridges and samples must be at operating temperature or the run fails.",
+      "source": "Standard four-step acid-base interpretation; device insert for POC ranges"
+    },
+    {
+      "panel": "abg",
+      "name": "pCO2",
+      "units": "mmHg",
+      "si": "kPa (÷7.5)",
+      "ref": "35–45",
+      "variants": "Lower in pregnancy (roughly 28–32). Chronically elevated in CO2 retainers.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "46–50, or 30–34",
+          "disp": "Trend against baseline. Common and often chronic."
+        },
+        {
+          "level": 2,
+          "val": "51–60 with a compensating bicarbonate and a near-normal pH",
+          "disp": "Likely chronic. Document as baseline and manage the underlying condition."
+        },
+        {
+          "level": 3,
+          "val": "Over 60 with pH under 7.30, or any rapid rise with falling mentation",
+          "disp": "Emergent transport. This is acute-on-chronic respiratory failure."
+        }
+      ],
+      "causes": "COPD, obesity hypoventilation, opioid and benzodiazepine effect, neuromuscular disease, chest wall restriction.",
+      "baseline": "Whether the bicarbonate has risen to match is the entire question. Compensated means chronic; uncompensated means new.",
+      "specimen": "As for pH.",
+      "source": "Device insert; standard acid-base interpretation"
+    },
+    {
+      "panel": "abg",
+      "name": "Lactate",
+      "units": "mg/dL",
+      "si": "mmol/L (÷9.01)",
+      "ref": "5–15 mg/dL (course textbook), equivalent to roughly 0.6–1.7 mmol/L",
+      "variants": "UNITS TRAP, and a serious one. The course textbook reports lactate in mg/dL while the sepsis and critical care literature uses mmol/L, and the two differ by about ninefold. A lactate of 12 is normal in mg/dL and lethal in mmol/L. Every item in this row must state its units explicitly, and one item should turn on the conversion itself. Rises transiently with exercise, seizure and a prolonged tourniquet.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "16–25 mg/dL (about 1.8–2.8 mmol/L)",
+          "disp": "Recheck after rehydration. Consider a benign cause before escalating."
+        },
+        {
+          "level": 2,
+          "val": "26–35 mg/dL (about 2.9–3.9 mmol/L)",
+          "disp": "Urgent evaluation. In a patient with any infective source this is a concern for systemic infection."
+        },
+        {
+          "level": 3,
+          "val": "36 mg/dL or above (about 4.0 mmol/L or above)",
+          "disp": "Emergent transport. Associated with markedly increased mortality regardless of how well the patient looks."
+        }
+      ],
+      "causes": "Sepsis, hypoperfusion, metformin in renal impairment, seizure, bowel ischemia, beta-agonist excess.",
+      "baseline": "This is the value that most often contradicts the physical exam, and that is precisely its worth. A lactate of 4.5 in a patient with normal vitals and an early infection is the strongest available argument for transport, and it is the kind of number a medic assessing on appearance alone would miss. It is also the answer to the metformin-plus-declining-renal-function case.",
+      "specimen": "A prolonged tourniquet or a clenched fist falsely raises lactate. Send-out samples need a fluoride-oxalate tube and prompt processing or the value keeps climbing in the tube.",
+      "source": "Surviving Sepsis Campaign; device insert"
+    },
+    {
+      "panel": "cbc",
+      "name": "Hemoglobin",
+      "units": "g/dL",
+      "si": "g/L (×10)",
+      "ref": "14–18 male; 12–16 female (course textbook)",
+      "variants": "Lower in pregnancy. Chronically low in CKD and in many malignancies.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "10.0–11.9, stable and matching baseline",
+          "disp": "Document and trend. Chronic anemia of renal disease lives here and needs no acute action."
+        },
+        {
+          "level": 2,
+          "val": "7.0–9.9, or any fall over 2 g/dL from baseline",
+          "disp": "Provider consult, or urgent if the fall is recent. Look for a source."
+        },
+        {
+          "level": 3,
+          "val": "Under 7.0, or any level with hemodynamic compromise, melena or frank bleeding",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "GI blood loss, anemia of chronic kidney disease, malignancy and chemotherapy, nutritional deficiency, chronic NSAID use.",
+      "baseline": "A CKD patient sitting at 9.5 for eighteen months is at baseline and does not need an ED. The same 9.5 in someone whose value was 13 a month ago is an occult bleed and does. Absolute value without a prior reading cannot separate the two, which is why every Arm A hemoglobin item needs a stated baseline.",
+      "specimen": "HemoCue readings are affected by poor technique on the microcuvette fill. Drawing above an IV dilutes the sample.",
+      "source": "WHO anemia thresholds; transfusion threshold per AABB guidance"
+    },
+    {
+      "panel": "cbc",
+      "origin": "record",
+      "name": "White blood cell count",
+      "units": "×10⁹/L",
+      "si": "cells/µL (×1000)",
+      "ref": "4.5–11.0, written as 4,500–11,000/µL in the course textbook",
+      "variants": "Benign ethnic neutropenia gives a lower baseline in some patients. Steroids raise it.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "11.1–15.0 or 3.5–4.4",
+          "disp": "Interpret with the clinical picture. A mild leukocytosis alone is weak evidence."
+        },
+        {
+          "level": 2,
+          "val": "15.1–30.0, or 1.0–3.4",
+          "disp": "Urgent evaluation, particularly with a fever or an identified source."
+        },
+        {
+          "level": 3,
+          "val": "Over 30.0, or under 1.0, or an absolute neutrophil count under 500 with any fever",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Infection, steroids, chemotherapy-induced marrow suppression, hematological malignancy, stress response.",
+      "baseline": "Neutropenic fever deserves its own scenario. A chemotherapy patient at home with a temperature of 38.3 and an ANC below 500 is a genuine emergency with a narrow antibiotic window, and the patient often looks entirely well. Medics have essentially no exposure to this, and the instinct to reassure and leave is exactly wrong. Conversely a steroid-driven leukocytosis of 14 in a COPD patient on prednisone is expected and means nothing.",
+      "specimen": "Requires an EDTA tube and timely processing for a differential. Not reliably available at point of care, so build these items as send-out results reviewed at a later visit.",
+      "source": "IDSA guidance on febrile neutropenia; Tietz-typical adult intervals"
+    },
+    {
+      "panel": "cbc",
+      "origin": "record",
+      "name": "Platelet count",
+      "units": "×10⁹/L",
+      "si": "cells/µL (×1000)",
+      "ref": "150–350 (course textbook)",
+      "variants": "Mild chronic reduction is common in cirrhosis.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "100–149",
+          "disp": "Document and trend. Common and usually chronic."
+        },
+        {
+          "level": 2,
+          "val": "50–99, or over 600",
+          "disp": "Provider consult. Review heparin exposure, new drugs and alcohol use."
+        },
+        {
+          "level": 3,
+          "val": "Under 20, or under 50 with active bleeding",
+          "disp": "Emergent transport. Spontaneous bleeding risk."
+        }
+      ],
+      "causes": "Cirrhosis, chemotherapy, heparin-induced thrombocytopenia, immune thrombocytopenia, alcohol, sepsis.",
+      "baseline": "The cirrhotic patient at 90 has been there for years. Pair a low platelet count with an INR before drawing any conclusion about bleeding risk, because in liver disease the two move together and neither alone tells the story.",
+      "specimen": "EDTA-induced clumping produces a spuriously low count. A surprise low platelet count in a well patient needs a citrate-tube redraw.",
+      "source": "Tietz-typical adult reference intervals"
+    },
+    {
+      "panel": "coag",
+      "name": "INR",
+      "units": "ratio",
+      "si": "—",
+      "ref": "0.8–1.1 off anticoagulation; therapeutic target 2.0–3.0 on warfarin (course textbook)",
+      "variants": "The course textbook gives a single therapeutic target of 2.0–3.0. Clinically the target is indication-specific and a mechanical mitral valve runs higher, at 2.5–3.5, but that refinement sits outside what this course teaches — decide whether you want it in the bank before writing items that turn on it.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Up to 0.5 outside the therapeutic window, no bleeding",
+          "disp": "Hold or adjust the dose per protocol and recheck. This is a leave-at-home decision."
+        },
+        {
+          "level": 2,
+          "val": "4.5–9.0, no bleeding",
+          "disp": "Hold warfarin, provider consult, recheck within 24 to 48 hours. Oral vitamin K may be indicated. Still not automatically a transport."
+        },
+        {
+          "level": 3,
+          "val": "Over 9.0, or any elevation with active bleeding, or any head injury on anticoagulation regardless of INR",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Dietary vitamin K change, antibiotics — particularly trimethoprim-sulfamethoxazole and metronidazole, amiodarone, acute illness, alcohol, adherence errors including double-dosing after a missed dose.",
+      "baseline": "Two items belong here. First, an INR of 4.5 without bleeding means hold the dose, not call an ambulance — a paramedic's binary training offers no middle option and defaults to transport, and the correct answer sits in the middle. Second, the target depends on the indication, so an INR of 2.6 is therapeutic in atrial fibrillation and subtherapeutic in a mechanical mitral valve, which means an item that gives an INR without the indication cannot be answered. The dietary and drug influences on the number are heavily tested and are set out in their own row below.",
+      "specimen": "POC INR meters are validated for warfarin monitoring only. They are unreliable with antiphospholipid antibodies and at very high INR values, where a venous confirmation is needed.",
+      "source": "CHEST antithrombotic therapy guidance; device insert for POC validation limits"
+    },
+    {
+      "panel": "coag",
+      "origin": "field",
+      "name": "Warfarin — dietary and drug influences on the INR",
+      "units": "INR effect",
+      "si": "—",
+      "ref": "A stable INR inside the indication-specific target on an unchanged dose, diet and medication list",
+      "variants": "The size of the shift depends on the baseline dose and on how abruptly the change happened. A gradual dietary drift moves the INR slowly; a new antibiotic can move it within days.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "INR has drifted BELOW target, no bleeding",
+          "disp": "Ask what has been ADDED to the diet. More dietary vitamin K means more antagonism of the warfarin and therefore a lower INR — a new leafy-green habit, a daily salad, broccoli, Brussels sprouts, kale or a green smoothie will all pull the number down. Also ask about a new supplement. The fix is consistency of intake rather than avoidance, plus a dose review if the change is permanent. Leave-at-home, with teach-back."
+        },
+        {
+          "level": 2,
+          "val": "INR has drifted ABOVE target, no bleeding",
+          "disp": "Ask two questions. What medication was started — trimethoprim-sulfamethoxazole, metronidazole, fluconazole, ciprofloxacin and amiodarone all raise the INR, and a course finished last week still counts. And what has LEFT the diet — a patient who has stopped eating greens, or stopped eating much at all through illness or depression, has lost their vitamin K intake and the INR climbs. Hold or reduce per protocol and consult."
+        },
+        {
+          "level": 3,
+          "val": "INR above target with active bleeding, or any head injury on warfarin regardless of the INR",
+          "disp": "Emergent transport. Vitamin K and factor replacement are hospital decisions, and a head injury on warfarin goes in even with a therapeutic number and a normal exam."
+        }
+      ],
+      "causes": "Antibiotics, amiodarone, azole antifungals, sustained high-dose acetaminophen, acute illness, thyroid change, alcohol, dietary vitamin K change in either direction, and adherence errors including doubling up after a missed dose.",
+      "baseline": "The DIRECTION is what students get backwards, and it is heavily tested. Vitamin K is the antidote to warfarin, so more vitamin K in the diet means less anticoagulation and a LOWER INR; less vitamin K means a HIGHER INR. A patient who has taken up eating salads will be subtherapeutic and at thrombotic risk, not bleeding risk. A patient who has stopped eating because they are unwell or low in mood will be supratherapeutic. Write items in both directions and make at least one of them the counterintuitive way round. Three further points worth items of their own: the counseling message is consistent intake rather than avoiding greens, because a stable diet can be dosed around and a fluctuating one cannot; antibiotics raise the INR by two mechanisms, inhibiting metabolism and killing the gut flora that produce vitamin K, which is why almost any antibiotic course warrants a recheck; and sustained high-dose acetaminophen raises the INR, which is regularly missed because patients do not report it as a medication.",
+      "specimen": "POC meters are validated for warfarin monitoring only and become unreliable at very high INR values, where a venous confirmation is needed before acting.",
+      "source": "CHEST antithrombotic therapy guidance; warfarin labeling"
+    },
+    {
+      "panel": "coag",
+      "origin": "record",
+      "name": "aPTT",
+      "units": "seconds",
+      "si": "—",
+      "ref": "25–40 (course textbook)",
+      "variants": "Reagent-dependent; the local laboratory range governs.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "36–45",
+          "disp": "Rarely actionable in the community setting."
+        },
+        {
+          "level": 2,
+          "val": "46–70",
+          "disp": "Provider consult if unexpected."
+        },
+        {
+          "level": 3,
+          "val": "Over 70 with bleeding",
+          "disp": "Urgent or emergent evaluation."
+        }
+      ],
+      "causes": "Unfractionated heparin, factor deficiencies, lupus anticoagulant, liver disease.",
+      "baseline": "Listed for completeness because the blueprint names coagulation studies generally. In practice a CP will not have this at the bedside and rarely acts on it. Keep the item count here low.",
+      "specimen": "Citrate tube, correct fill volume. An underfilled tube falsely prolongs the result.",
+      "source": "Local laboratory reagent-specific range"
+    },
+    {
+      "panel": "ddimer",
+      "name": "D-dimer",
+      "units": "ng/mL FEU",
+      "si": "mg/L FEU (÷1000)",
+      "ref": "Under 500 conventional cutoff",
+      "variants": "Baseline is higher in pregnancy, malignancy, recent surgery, infection and advanced age, all of which reduce the test's usefulness in exactly the population a community paramedic sees.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Below 500, with low or moderate pretest probability",
+          "disp": "Pulmonary embolism and deep vein thrombosis are effectively excluded. This is the result that lets a patient stay home, and it is the only genuinely useful D-dimer result."
+        },
+        {
+          "level": 2,
+          "val": "Above 500, with low or moderate pretest probability",
+          "disp": "Needs imaging, so an urgent same-day referral. On its own this does not diagnose anything."
+        },
+        {
+          "level": 3,
+          "val": "Any result with high pretest probability, or with hypoxia, syncope, unilateral leg swelling or pleuritic chest pain",
+          "disp": "Emergent transport. A negative D-dimer does not exclude PE when pretest probability is high, and ordering one in that setting is the wrong test."
+        }
+      ],
+      "causes": "Anything that generates or breaks down fibrin: thrombosis, infection, malignancy, recent surgery or trauma, pregnancy, advanced age.",
+      "baseline": "The highest-value gap item in the table. A D-dimer has clinical meaning only as a rule-out, and only when pretest probability is low or moderate. Paramedics are trained almost entirely in rule-in thinking and have no framework for negative predictive value, so a positive result becomes an automatic transport and generates a great deal of unnecessary imaging. The single most instructive item is one where the correct answer is that the test should not have been ordered at all, because the pretest probability was high and a negative result would not have changed anything.",
+      "specimen": "Citrate tube, correct fill. Assay units differ between platforms — FEU and DDU are not interchangeable and mixing them up shifts the cutoff by roughly a factor of two.",
+      "source": "Wells and revised Geneva scores for pretest probability"
+    },
+    {
+      "panel": "cardiac",
+      "name": "BNP",
+      "units": "pg/mL",
+      "si": "ng/L (1:1)",
+      "ref": "Under 200 in compensated heart failure; 200–400 moderate; above 400 moderate to severe (course textbook severity staging)",
+      "variants": "Obesity lowers it, sometimes substantially. Renal impairment raises it. Rises with age and is higher in women.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "200–400, described by the textbook as moderate heart failure",
+          "disp": "Not a disposition on its own. Weigh the patient, review the diuretic dose, compare against their dry-weight baseline if one exists. This is the band where a community paramedic earns their keep and no transport is needed."
+        },
+        {
+          "level": 2,
+          "val": "Above 400, described by the textbook as moderate to severe, particularly with weight gain or worsening edema",
+          "disp": "Provider consult for a diuretic adjustment, or an urgent referral. Still frequently manageable at home."
+        },
+        {
+          "level": 3,
+          "val": "Any value with resting hypoxia, orthopnea at rest, hypotension or new arrhythmia",
+          "disp": "Emergent transport. The clinical picture governs, not the number."
+        }
+      ],
+      "causes": "Ventricular wall stress from heart failure, but also atrial fibrillation, pulmonary embolism, renal failure, sepsis and advanced age.",
+      "baseline": "The course textbook frames BNP as a severity stage rather than a diagnostic cutoff, and it does not cover trending at all — which is the single biggest omission in its lab content, because trending is the whole of the community paramedic's advantage here. Build items on the textbook's bands so students are not caught out, then add the trending concept explicitly as taught material rather than as an exam expectation. The substance underneath: a single BNP does not separate acute decompensation from stable chronic disease, so a patient with long-standing heart failure living at 600 tells you nothing without their own dry-weight baseline. Obesity suppresses the value, giving a falsely reassuring number in exactly the population most likely to have heart failure, and renal impairment elevates it independently. Daily weights beat a single BNP for detecting decompensation, which deserves an item of its own.",
+      "specimen": "BNP and NT-proBNP are different analytes with different cutoffs and cannot be compared across assays. Whole-blood EDTA for the i-STAT cartridge; BNP is unstable in glass.",
+      "source": "AHA/ACC/HFSA heart failure guideline; device insert for assay-specific cutoffs"
+    },
+    {
+      "panel": "glucose",
+      "origin": "field",
+      "name": "Ketones — urine",
+      "units": "qualitative",
+      "si": "—",
+      "ref": "Negative",
+      "variants": "Dipstick strips detect acetoacetate. They do not measure beta-hydroxybutyrate, which is the predominant ketone early in ketoacidosis, so a strip can under-read at the point the patient is sickest.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Trace or small, patient alert and taking fluids",
+          "disp": "Recheck after hydration and a review of insulin adherence. Often correctable at home with a sick-day plan."
+        },
+        {
+          "level": 2,
+          "val": "Moderate, or any ketonuria with a glucose above 250",
+          "disp": "Provider consult, same day. Needs a bicarbonate."
+        },
+        {
+          "level": 3,
+          "val": "Large, or any ketonuria with vomiting, Kussmaul respirations, altered mentation or a low bicarbonate",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Insulin omission or pump failure, intercurrent illness raising requirements, prolonged fasting, alcohol, new infection.",
+      "baseline": "The teaching point is the lag in both directions. Because strips read acetoacetate rather than beta-hydroxybutyrate, ketonuria can appear to worsen while the patient is actually improving on treatment, as beta-hydroxybutyrate converts to acetoacetate during recovery. A rising strip result in a patient who is clinically better is not deterioration, and reacting to the strip instead of the patient is the error. The second point is that ketones separate simple hyperglycemia from evolving ketoacidosis, which is precisely the distinction that decides whether a long-standing diabetic running 280 stays home.",
+      "specimen": "Strips expire quickly once the bottle is opened and give false negatives when stale — check the open-date. A very dilute urine under-reads.",
+      "source": "ADA Standards of Care"
+    },
+    {
+      "panel": "urine",
+      "origin": "field",
+      "name": "Urine dipstick",
+      "units": "qualitative",
+      "si": "—",
+      "ref": "Negative nitrites, negative leukocyte esterase, negative protein, no blood",
+      "variants": "Specific gravity 1.005–1.030. Chronic proteinuria is expected in diabetic and hypertensive nephropathy.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Positive nitrites or leukocyte esterase with no urinary symptoms",
+          "disp": "No antibiotic and no transport. This is asymptomatic bacteriuria. Document, hydrate, and look elsewhere for the cause of whatever prompted the visit."
+        },
+        {
+          "level": 2,
+          "val": "Positive with dysuria, frequency, urgency or suprapubic pain",
+          "disp": "Provider consult for oral treatment at home. Send a culture if one can be sent."
+        },
+        {
+          "level": 3,
+          "val": "Positive with fever, flank pain, rigors or hemodynamic change",
+          "disp": "Urgent or emergent evaluation. This is pyelonephritis or urosepsis, not cystitis."
+        }
+      ],
+      "causes": "True infection, colonization, catheter presence, contamination, and in the protein column, chronic kidney disease.",
+      "baseline": "This is arguably the single highest-yield gap item in the entire bank, because nearly everyone gets it wrong — medics, nurses and physicians alike. A positive dipstick in an older adult with no urinary symptoms is asymptomatic bacteriuria and does not warrant antibiotics in a non-pregnant patient. Confusion on its own does not make it symptomatic, and reflexively attributing new confusion to a urinary infection is how the actual cause gets missed. Treating it drives resistance, Clostridioides difficile and a great deal of avoidable transport. Write at least two items here, one where the correct answer is to do nothing about the urine and keep looking.",
+      "specimen": "A poorly collected mid-stream sample reads positive from perineal flora. Any long-term catheter is colonized by definition, so a dipstick from a catheter bag is close to uninterpretable.",
+      "source": "IDSA guidance on asymptomatic bacteriuria; USPSTF on screening"
+    },
+    {
+      "panel": "micro",
+      "origin": "field",
+      "name": "Rapid antigen testing — influenza and group A strep",
+      "units": "qualitative",
+      "si": "—",
+      "ref": "Negative",
+      "variants": "Sensitivity falls late in the illness course and with poor swab technique.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Positive, patient well, within the antiviral window",
+          "disp": "Home management with a provider consult about antivirals, plus household isolation guidance. Leave-at-home."
+        },
+        {
+          "level": 2,
+          "val": "Positive in a patient with significant comorbidity, or outside the treatment window",
+          "disp": "Provider consult. The comorbidity drives the decision, not the result."
+        },
+        {
+          "level": 3,
+          "val": "Any result with hypoxia, dehydration or an inability to maintain oral intake",
+          "disp": "Urgent or emergent evaluation regardless of what the test says."
+        }
+      ],
+      "causes": "Not applicable.",
+      "baseline": "A negative rapid test in a high-prevalence season does not exclude the illness, and the useful decision point is rarely the result itself — it is whether the patient is inside the antiviral window, which is roughly 48 hours from symptom onset, and whether their comorbidities put them in a treatment group. That makes this a timing and eligibility question rather than a positive-or-negative question. The secondary teaching point is household isolation and the PPE level the CP should be in, which links to the wellness and safety domain.",
+      "specimen": "Swab technique and timing govern sensitivity more than the platform does.",
+      "source": "CDC influenza antiviral guidance; IDSA pharyngitis guidance"
+    },
+    {
+      "panel": "bmp",
+      "origin": "record",
+      "name": "eGFR",
+      "units": "mL/min/1.73m²",
+      "si": "—",
+      "ref": "90 or above",
+      "variants": "Stage 3a is 45–59, stage 3b is 30–44, stage 4 is 15–29, stage 5 is under 15.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "45–59 and stable",
+          "disp": "Not a disposition question. Screen the medication list against this number."
+        },
+        {
+          "level": 2,
+          "val": "30–44, or a fall of a stage from baseline",
+          "disp": "Provider consult on dose adjustment. Review NSAIDs, metformin and anticoagulant dosing."
+        },
+        {
+          "level": 3,
+          "val": "Under 15, or an acute fall with hyperkalemia or oliguria",
+          "disp": "Urgent or emergent evaluation."
+        }
+      ],
+      "causes": "Diabetic and hypertensive nephropathy, obstruction, nephrotoxic drugs, chronic heart failure.",
+      "baseline": "This is the number that makes a creatinine interpretable and the number that governs drug dosing, which is why it belongs on every reconciliation item. Metformin is the item to build, and build it on the creatinine rather than the eGFR: the long-standing contraindication is a creatinine at or above 1.5 mg/dL in men and 1.4 mg/dL in women, and that is the threshold a student is most likely to be asked for. Metformin should also be held during any acute illness that threatens perfusion, because the risk being avoided is lactic acidosis. Gabapentin, sulfonylureas, allopurinol and many antibiotics accumulate as clearance falls. A paramedic reading a discharge summary against the discharge medication list is doing exactly the work this domain describes.",
+      "specimen": "Calculated, not measured. Creatinine clearance by the Cockcroft-Gault equation, which needs age, weight and sex, is the older and still widely expected method, and a measured 24-hour urine creatinine clearance is the reference standard. All of them are unreliable in acute kidney injury, at extremes of muscle mass and in pregnancy.",
+      "source": "KDIGO CKD classification; Cockcroft-Gault; metformin labeling"
+    },
+    {
+      "panel": "bmp",
+      "origin": "record",
+      "name": "Magnesium",
+      "units": "mg/dL",
+      "si": "mmol/L (÷2.43)",
+      "ref": "1.7–2.2",
+      "variants": "Chronically low in long-term proton pump inhibitor and loop diuretic users, and in alcohol use disorder.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "1.5–1.6",
+          "disp": "Oral replacement per provider. Not a transport."
+        },
+        {
+          "level": 2,
+          "val": "1.0–1.4",
+          "disp": "Provider consult. Check a potassium and an ECG."
+        },
+        {
+          "level": 3,
+          "val": "Under 1.0, or any level with arrhythmia or seizure",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Loop and thiazide diuretics, proton pump inhibitors, alcohol, diarrhea, poor intake, refeeding.",
+      "baseline": "The item to build is refractory hypokalemia. Potassium cannot be corrected while magnesium is low, so a patient whose potassium keeps drifting down despite oral supplementation has a magnesium problem, and the correct action is to check it rather than to increase the potassium dose again. Medics encounter magnesium only in eclampsia and torsades and have no framework for chronic depletion, despite it being common in exactly this diuretic-heavy population.",
+      "specimen": "Serum magnesium is a poor reflection of total body stores; a normal level does not exclude depletion.",
+      "source": "Tietz-typical adult reference intervals; drug labeling on PPI-associated hypomagnesemia"
+    },
+    {
+      "panel": "bmp",
+      "origin": "record",
+      "name": "Phosphate",
+      "units": "mg/dL",
+      "si": "mmol/L (÷3.1)",
+      "ref": "2.5–4.5",
+      "variants": "Chronically elevated in advanced chronic kidney disease.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "2.0–2.4 or 4.6–5.5",
+          "disp": "Review binder timing and dietary sources. Care-plan item."
+        },
+        {
+          "level": 2,
+          "val": "1.0–1.9 or 5.6–7.0",
+          "disp": "Provider consult."
+        },
+        {
+          "level": 3,
+          "val": "Under 1.0",
+          "disp": "Urgent evaluation. Risk of respiratory muscle weakness and arrhythmia."
+        }
+      ],
+      "causes": "High: renal failure, inadequate binder use, binders taken at the wrong time relative to meals. Low: refeeding, alcohol, malabsorption.",
+      "baseline": "Refeeding syndrome is the case worth writing. A malnourished patient — post-discharge, alcohol use disorder, or an eating pattern that has collapsed — who is restarted on nutrition can drop their phosphate sharply in the first twenty-four to seventy-two hours. The CP doing a follow-up visit at day two is positioned to catch it and nobody has told them to look. On the high side, the practical teaching point is that phosphate binders only work when taken with food, and adherence failures here are almost always timing failures rather than refusals.",
+      "specimen": "Hemolysis falsely elevates the result.",
+      "source": "KDIGO CKD-MBD guidance; NICE guidance on refeeding risk"
+    },
+    {
+      "panel": "hepatic",
+      "origin": "record",
+      "name": "Albumin",
+      "units": "g/dL",
+      "si": "g/L (×10)",
+      "ref": "3.5–5.0",
+      "variants": "Falls with age, chronic inflammation and malnutrition. Not corrected for anything.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "3.0–3.4",
+          "disp": "Nutritional care-plan item. Never a disposition driver."
+        },
+        {
+          "level": 2,
+          "val": "2.5–2.9",
+          "disp": "Provider and dietitian involvement. Flag wound healing risk."
+        },
+        {
+          "level": 3,
+          "val": "Under 2.5",
+          "disp": "Not an emergency by itself. Signals a poor prognosis and should prompt a goals-of-care conversation rather than a transport."
+        }
+      ],
+      "causes": "Malnutrition, chronic inflammation, liver disease, nephrotic protein loss, advanced malignancy.",
+      "baseline": "Two uses. It is required to correct a total calcium, adding 0.8 mg/dL for every 1 g/dL below 4.0 — without it a total calcium is uninterpretable. And it is one of the better predictors of whether a wound will heal, which connects the lab table directly to the wound care items in the blueprint. Its value to a CP is that it is never urgent: it identifies a patient who needs nutritional intervention and realistic expectations, which is a care-plan output, not a disposition. Good material for items where the correct answer is explicitly not to transport.",
+      "specimen": "No special handling.",
+      "source": "Tietz-typical adult reference intervals; wound healing literature on albumin as a predictor"
+    },
+    {
+      "panel": "hepatic",
+      "origin": "record",
+      "name": "Liver enzymes, alkaline phosphatase and bilirubin",
+      "units": "U/L; mg/dL",
+      "si": "—",
+      "ref": "ALT 10–40, AST 10–30, alkaline phosphatase 30–120, total bilirubin 0.2–1.2 (course textbook)",
+      "variants": "ALT is slightly lower in women. Both fall in advanced cirrhosis as functioning liver mass is lost.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Up to three times the upper limit, stable",
+          "disp": "Care-plan item. Review alcohol, acetaminophen and statin use."
+        },
+        {
+          "level": 2,
+          "val": "Three to ten times the upper limit, or a rising bilirubin",
+          "disp": "Provider consult."
+        },
+        {
+          "level": 3,
+          "val": "Over ten times the upper limit, or jaundice with confusion or coagulopathy",
+          "disp": "Emergent transport. Consider acute liver failure or encephalopathy."
+        }
+      ],
+      "causes": "Alcohol, acetaminophen, statins, viral hepatitis, biliary obstruction, heart failure causing congestive hepatopathy.",
+      "baseline": "The gap item is the interaction with coagulation. An INR of 1.8 in a cirrhotic patient is not anticoagulation and does not mean the patient cannot clot — the liver is failing to make both procoagulant and anticoagulant factors, so the INR overstates bleeding risk and these patients can still thrombose. Reversing it is not indicated. Second point worth an item: the acetaminophen ceiling in established liver disease is lower, commonly 2 g per day, and a discharge medication list carrying the standard 4 g maximum is a reconciliation catch.",
+      "specimen": "No special handling.",
+      "source": "AASLD guidance; Tietz-typical adult reference intervals"
+    },
+    {
+      "panel": "hepatic",
+      "origin": "record",
+      "name": "Ammonia",
+      "units": "µg/dL",
+      "si": "µmol/L (×0.587)",
+      "ref": "15–45",
+      "variants": "Venous and arterial values differ. Smokers run higher. Laboratory ranges vary more than most analytes because of handling sensitivity.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "46–80 with no change in mental status",
+          "disp": "Care-plan item. Review lactulose adherence and stool frequency. Leave-at-home."
+        },
+        {
+          "level": 2,
+          "val": "81–150, or any elevation with asterixis, day-night reversal or new mild confusion",
+          "disp": "Provider consult. Grade 1 to 2 encephalopathy from missed lactulose is frequently correctable at home by titrating to two or three soft stools daily, and hunting the precipitant matters more than the number."
+        },
+        {
+          "level": 3,
+          "val": "Any level with marked confusion, somnolence, an inability to take oral lactulose, or evidence of GI bleeding",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Constipation or missed lactulose doses, GI bleeding, infection including spontaneous bacterial peritonitis, dehydration from over-diuresis, benzodiazepines and opioids, dietary protein load, renal decline.",
+      "baseline": "The ammonia level correlates poorly with the grade of encephalopathy, so the patient is treated and the number is not. A cirrhotic at 90 who is oriented and walking does not need an ambulance; one at 55 who has become somnolent does. Because of that, an item here should turn on the mental status and the precipitant rather than the value, and the strongest version gives a rising ammonia with an unchanged patient. Two further points worth items: the correct first question is almost always about bowel movements, since missed lactulose and constipation are the commonest precipitant and the easiest thing a CP can fix in the home; and protein restriction is obsolete and now considered harmful, so a discharge instruction limiting protein is a reconciliation catch.",
+      "specimen": "The most handling-sensitive analyte in the table, which makes it a strong specimen-integrity item in its own right. The sample must go on ice and be separated within roughly fifteen minutes, or amino acid deamination in the tube drives the result up. A prolonged tourniquet, fist clenching and recent smoking all falsely elevate it. A strikingly high ammonia on a discharge summary in a patient who looks well may simply be a badly handled specimen.",
+      "source": "AASLD and EASL guidance on hepatic encephalopathy; Tietz-typical adult reference intervals"
+    },
+    {
+      "panel": "hepatic",
+      "origin": "record",
+      "name": "Hematinics — ferritin, B12, vitamin D",
+      "units": "ng/mL; pg/mL; ng/mL",
+      "si": "—",
+      "ref": "Ferritin 30–400 ng/mL; B12 200–900 pg/mL; 25-OH vitamin D 30–100 ng/mL",
+      "variants": "Ferritin targets differ in chronic kidney disease and in heart failure, where iron deficiency is treated at higher ferritin levels than elsewhere.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Any abnormality without symptoms",
+          "disp": "Care-plan item only. Replacement and a recheck interval."
+        },
+        {
+          "level": 2,
+          "val": "B12 under 200 with neuropathy or cognitive change",
+          "disp": "Provider consult. Potentially reversible if caught."
+        },
+        {
+          "level": 3,
+          "val": "Not applicable",
+          "disp": "None of these produce an emergency. If an item here has a transport answer, the item is wrong."
+        }
+      ],
+      "causes": "Iron deficiency from occult GI loss, metformin and proton pump inhibitor use depleting B12, housebound status and vitamin D deficiency.",
+      "baseline": "Two points. Ferritin is an acute-phase reactant, so it rises with any inflammation and can look normal in a genuinely iron-deficient patient — transferrin saturation is the more reliable measure. And B12 deficiency is common in long-term metformin and proton pump inhibitor users, which describes a large share of a CP caseload; it presents as neuropathy, gait change or cognitive slowing and gets attributed to age. A housebound patient with vitamin D deficiency and falls is the classic bundled case.",
+      "specimen": "No special handling.",
+      "source": "BSG and AGA guidance on iron deficiency; drug labeling on metformin and B12"
+    },
+    {
+      "panel": "cardiac",
+      "origin": "record",
+      "name": "Troponin",
+      "units": "ng/mL",
+      "si": "—",
+      "ref": "0–0.4 ng/mL, reported generically as troponin (course textbook)",
+      "variants": "RESOLVED. The textbook gives this as a generic troponin rather than specifying troponin I or T, which settles how items should be written: say troponin, give the value in ng/mL, and classify against 0.4. Do not write items that turn on the difference between troponin I and troponin T, on platform-specific cutoffs, or on high-sensitivity assays — the course does not make those distinctions and an item testing them would be unfair. Worth knowing as the instructor that a value of 0.2 is normal on this course and would be clearly abnormal against a contemporary troponin I assay, but that belongs in a conversation, not in the bank. Chronically elevated in chronic kidney disease, heart failure and the very old.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "A peak value on a discharge summary after a treated event",
+          "disp": "Historical. No action. Use it to understand what happened, then work the discharge plan and the medication list."
+        },
+        {
+          "level": 2,
+          "val": "A mildly elevated stable value in a known chronic kidney disease or heart failure patient",
+          "disp": "Likely their baseline. Not a disposition trigger without a change."
+        },
+        {
+          "level": 3,
+          "val": "A new elevation drawn today with chest pain, dyspnea or an ECG change",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Myocardial infarction, but also myocarditis, pulmonary embolism, sepsis, tachyarrhythmia, chronic kidney disease, heart failure.",
+      "baseline": "This is the cleanest illustration of the provenance problem. A troponin on a discharge sheet is a historical peak from an event that has already been treated, and the infarct is not re-decided in someone's living room. Medics see the word troponin and think acute, so an item where the answer is that the number is old and irrelevant teaches the distinction directly. The second point is that many CP patients have a chronically raised baseline from renal disease or heart failure, so a single mildly elevated value proves nothing — the delta does the diagnostic work, not the absolute number.",
+      "specimen": "The result is uninterpretable without the time since symptom onset, because troponin takes hours to rise. A single early value does not exclude an infarct, which is why serial sampling exists and why a discharge summary showing one number tells you less than it appears to.",
+      "source": "Course textbook reference range"
+    },
+    {
+      "panel": "endo",
+      "origin": "record",
+      "name": "HbA1c",
+      "units": "%",
+      "si": "mmol/mol (IFCC)",
+      "ref": "Under 5.7 normal; 5.7–6.4 prediabetes; 6.5 or above diagnostic of diabetes",
+      "variants": "Common target is under 7 for most adults, with a deliberately higher target accepted in frail older patients and in those with limited life expectancy. The looser target is the point; the specific number is individualized by the provider.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Above the individualized target",
+          "disp": "Care-plan item. Education, adherence review, provider consult on regimen change. Never a transport."
+        },
+        {
+          "level": 2,
+          "val": "Above 10, or a large rise from a prior value",
+          "disp": "Provider consult on a regimen change and a review of what changed at home."
+        },
+        {
+          "level": 3,
+          "val": "Not applicable",
+          "disp": "An HbA1c never generates an emergency. Any item here with a transport answer is a badly written item."
+        }
+      ],
+      "causes": "Adherence, regimen inadequacy, steroid courses, dietary change, progression of disease.",
+      "baseline": "The counterintuitive item is over-treatment. An HbA1c of 6.2 in an eighty-eight-year-old on a sulfonylurea is not good control — it is a hypoglycemia risk in a patient for whom a deliberately looser target would be appropriate, and the correct answer is to relax the target and reduce the drug rather than to congratulate anyone. Paramedics will read a low number as success. The general principle worth teaching alongside it: an HbA1c is a rolling three-month average, so it can never answer a question about today. It sets the care plan. Reliability also fails in anemia, chronic kidney disease, recent transfusion and hemoglobinopathies, which is worth one item of its own.",
+      "specimen": "Not a fasting test. Recent transfusion invalidates it.",
+      "source": "ADA Standards of Care; guidance on individualized targets in older adults"
+    },
+    {
+      "panel": "endo",
+      "origin": "record",
+      "name": "TSH",
+      "units": "mIU/L",
+      "si": "—",
+      "ref": "0.4–4.0",
+      "variants": "Upper limit drifts higher with age; a mildly raised TSH in an eighty-year-old may not need treatment.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "4.1–10.0 with normal free T4",
+          "disp": "Subclinical. Care-plan item, recheck interval set by the provider."
+        },
+        {
+          "level": 2,
+          "val": "Over 10, or suppressed under 0.1",
+          "disp": "Provider consult on a dose change."
+        },
+        {
+          "level": 3,
+          "val": "Any value with hypothermia and altered mentation, or with fever and tachyarrhythmia",
+          "disp": "Emergent transport. Myxedema coma and thyroid storm are both rare and both lethal."
+        }
+      ],
+      "causes": "Inadequate or excessive replacement, adherence failure, amiodarone, recent illness, absorption interference from calcium and iron.",
+      "baseline": "A dose change takes about six weeks to show in the TSH, so nothing about this number is ever a today decision, and a recheck sooner than six weeks is simply uninformative. The practical CP items are absorption interference — levothyroxine taken alongside calcium, iron or a proton pump inhibitor will not be absorbed properly, which is a reconciliation and teach-back catch — and untreated hypothyroidism sitting on the differential for fatigue, constipation, depression and functional decline in an older patient, where it gets written off as aging.",
+      "specimen": "Recent acute illness distorts the result; avoid interpreting a TSH drawn during a hospitalization.",
+      "source": "ATA guidance on hypothyroidism; drug labeling on levothyroxine absorption"
+    },
+    {
+      "panel": "urine",
+      "origin": "record",
+      "name": "Urine culture",
+      "units": "CFU/mL",
+      "si": "—",
+      "ref": "No growth, or growth reported as contaminant",
+      "variants": "Significant growth thresholds vary with collection method.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Significant growth with no urinary symptoms",
+          "disp": "No antibiotic. Asymptomatic bacteriuria does not need treating in a non-pregnant patient."
+        },
+        {
+          "level": 2,
+          "val": "Significant growth with symptoms, or a resistant organism needing a regimen change",
+          "disp": "Provider consult. This is a reconciliation catch if the discharge antibiotic does not cover what grew."
+        },
+        {
+          "level": 3,
+          "val": "Growth with systemic features",
+          "disp": "Urgent or emergent evaluation."
+        }
+      ],
+      "causes": "True infection, colonization, contamination.",
+      "baseline": "The high-value item is the sensitivity report against the discharge prescription. A patient sent home on an antibiotic that the organism turned out to be resistant to is a genuine and common care-coordination failure, and the culture result frequently finalizes after discharge, meaning nobody has looked at it. A CP reviewing the record can catch it. Long-term catheterized patients are colonized by definition, so a positive culture in that group tells you almost nothing without symptoms.",
+      "specimen": "Collection method governs interpretation. A bag specimen from an indwelling catheter is not a valid culture.",
+      "source": "IDSA guidance on asymptomatic bacteriuria and on catheter-associated infection"
+    },
+    {
+      "panel": "micro",
+      "origin": "record",
+      "name": "Pending cultures and outstanding results at discharge",
+      "units": "—",
+      "si": "—",
+      "ref": "No results outstanding, or a named clinician responsible for following each one up",
+      "variants": "Not applicable.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "A result outstanding with a documented follow-up owner",
+          "disp": "Confirm the appointment exists and the patient knows about it. Care-plan item."
+        },
+        {
+          "level": 2,
+          "val": "A result outstanding with no documented owner",
+          "disp": "Contact the discharging service or the primary provider to establish who is following it. This is the correct answer far more often than any clinical action."
+        },
+        {
+          "level": 3,
+          "val": "A finalized positive blood culture nobody has acted on",
+          "disp": "Urgent provider contact the same day."
+        }
+      ],
+      "causes": "Discharge before finalization, handover failure, results returning to a service that has already discharged the patient.",
+      "baseline": "Not a lab value at all, and included deliberately. This is where the blueprint's healthcare coordination, record review and navigation items live, and it is the one category where the correct answer is almost never clinical. The CP's contribution is noticing that a blood culture drawn on day one finalized on day four, two days after the patient went home, and that no named person is watching for it. Write several of these. They are also the easiest items to get wrong by over-clinicalizing — a student who reaches for a disposition here has missed the point.",
+      "specimen": "Not applicable.",
+      "source": "Joint Commission and AHRQ guidance on transitions of care and test-result follow-up"
+    },
+    {
+      "panel": "drug",
+      "origin": "record",
+      "name": "Therapeutic drug levels — digoxin, vancomycin",
+      "units": "ng/mL; mg/L",
+      "si": "—",
+      "ref": "Digoxin 0.8–2.0 ng/mL; vancomycin trough 10–20 mg/L",
+      "variants": "ERA CONFLICT, flagged deliberately. The 0.8–2.0 ng/mL range above is what the exam expects and what most references still print. Current heart-failure practice targets 0.5–0.9 ng/mL, so a level of 1.4 is exam-therapeutic and clinically high. Teach both and say which is which — this is the one place in the table where the two standards actively contradict each other.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Digoxin 2.1–2.5 with no symptoms",
+          "disp": "Provider consult on dose reduction. Check potassium, magnesium and renal function at the same time — they matter more than the level."
+        },
+        {
+          "level": 2,
+          "val": "Digoxin 2.6–3.5, or any level with nausea, vomiting, yellow-green visual disturbance, confusion or new bradycardia",
+          "disp": "Urgent evaluation. Symptoms outrank the number."
+        },
+        {
+          "level": 3,
+          "val": "Digoxin over 3.5, or any level with arrhythmia or significant hyperkalemia",
+          "disp": "Emergent transport. Digoxin-specific antibody fragments are a hospital decision."
+        }
+      ],
+      "causes": "Declining renal function, dose errors, interacting drugs including amiodarone and verapamil, hypokalemia potentiating toxicity, hypomagnesemia.",
+      "baseline": "The central teaching point is that a digoxin level inside the reference range does not exclude toxicity. Hypokalemia, hypomagnesemia and falling renal function all potentiate the drug, so a patient at 1.8 who has been started on a loop diuretic since discharge can be clinically toxic while the number looks fine. That makes the potassium, the magnesium and the creatinine part of every digoxin item, and it is the reason the correct action is frequently to check an electrolyte panel rather than to transport. The classic presentation is worth its own item: nausea, anorexia, yellow-green visual disturbance and confusion in an older patient, easily written off as a viral illness or as dementia. For vancomycin, the relevant population is home infusion patients, where the practical work is confirming the level was drawn at the right time relative to the dose and that someone is acting on the result.",
+      "specimen": "Digoxin must be drawn at least six to eight hours post-dose or the result is uninterpretably high. Vancomycin troughs are drawn immediately before a dose. A mistimed level is the commonest error in this category and a good item in its own right.",
+      "source": "Digoxin labeling and standard therapeutic drug monitoring references; vancomycin trough monitoring guidance"
+    },
+    {
+      "panel": "cbc",
+      "origin": "record",
+      "name": "Red blood cell count",
+      "units": "×10¹²/L",
+      "si": "million/µL (1:1)",
+      "ref": "3.9–5.5 (course textbook)",
+      "variants": "Lower in women and in pregnancy. The textbook gives a single range without a sex split.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Mildly low with a hemoglobin that matches",
+          "disp": "Adds nothing beyond the hemoglobin. Trend the hemoglobin instead."
+        },
+        {
+          "level": 2,
+          "val": "Low with a disproportionately low hemoglobin",
+          "disp": "Points to a microcytic process, usually iron deficiency. Care-plan item and a provider consult."
+        },
+        {
+          "level": 3,
+          "val": "Not a standalone critical value",
+          "disp": "Escalation is driven by the hemoglobin and the patient, never by the red cell count."
+        }
+      ],
+      "causes": "Blood loss, nutritional deficiency, chronic kidney disease, marrow suppression, hemodilution.",
+      "baseline": "Included because the textbook lists it, not because it decides anything. The hemoglobin carries all the clinical weight and the red cell count adds only indices. Keep the item count here to one, and if a student reaches a disposition from a red cell count rather than from the hemoglobin, the distractor has worked.",
+      "specimen": "EDTA tube. Dilution from drawing above a running line affects it as it does the hemoglobin.",
+      "source": "Course textbook reference range"
+    },
+    {
+      "panel": "coag",
+      "origin": "record",
+      "name": "Prothrombin time",
+      "units": "seconds",
+      "si": "—",
+      "ref": "10–13 (course textbook)",
+      "variants": "Reagent-dependent, which is the reason the INR exists.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "14–17",
+          "disp": "Interpret the INR instead. The raw PT is rarely the actionable number."
+        },
+        {
+          "level": 2,
+          "val": "18–25",
+          "disp": "Provider consult, driven by the corresponding INR."
+        },
+        {
+          "level": 3,
+          "val": "Over 25 with bleeding",
+          "disp": "Urgent or emergent evaluation."
+        }
+      ],
+      "causes": "Warfarin, vitamin K deficiency, liver disease, disseminated intravascular coagulation.",
+      "baseline": "The reason the INR was created is that a raw prothrombin time is not comparable between laboratories using different reagents, so the same blood yields different seconds in different labs. That is the teaching point, and it is why every warfarin decision runs off the INR rather than the PT. Expect the exam to favor the INR heavily; keep this row to one or two items covering the relationship between the two.",
+      "specimen": "Citrate tube, correct fill volume. An underfilled tube falsely prolongs the result.",
+      "source": "Course textbook reference range"
+    },
+    {
+      "panel": "enzymes",
+      "origin": "record",
+      "name": "Creatine kinase",
+      "units": "U/L",
+      "si": "—",
+      "ref": "40–150 (course textbook)",
+      "variants": "Higher with greater muscle mass and after exercise. Rises substantially after any intramuscular injection or a fall with soft-tissue injury.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "151–500",
+          "disp": "Common and usually benign. Ask about exercise, a recent fall or an injection before concluding anything."
+        },
+        {
+          "level": 2,
+          "val": "501–5000",
+          "disp": "Provider consult. Review statin use and hydration. In a patient who has been down for a prolonged period, this needs following."
+        },
+        {
+          "level": 3,
+          "val": "Over 5000, or any elevation with dark urine, reduced urine output or a prolonged down time",
+          "disp": "Emergent transport. Rhabdomyolysis threatens the kidneys."
+        }
+      ],
+      "causes": "Statins, trauma, prolonged immobility after a fall, seizure, intense exertion, hypothyroidism, intramuscular injections.",
+      "baseline": "The community paramedic case is the long lie. An older patient found on the floor after some hours has a real risk of rhabdomyolysis and acute kidney injury, and the clinical appearance can be unremarkable once they are back in a chair. This is one of the few places where the number should override a reassuring exam. The other item worth building is statin-associated muscle complaints, where a patient reporting aching thighs on a statin needs a CK rather than reassurance, and the correct action is a provider consult rather than telling them to stop the drug themselves.",
+      "specimen": "Hemolysis falsely elevates the result. Note any intramuscular injection in the preceding days, since it raises CK independently.",
+      "source": "Course textbook reference range"
+    },
+    {
+      "panel": "enzymes",
+      "origin": "record",
+      "name": "Amylase and lipase",
+      "units": "U/L",
+      "si": "—",
+      "ref": "Laboratory-specific; the course textbook does not give a firm range",
+      "variants": "Lipase is more specific to the pancreas and stays elevated longer than amylase.",
+      "gap": false,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Mildly elevated, patient comfortable",
+          "disp": "Trend rather than act. Review alcohol and any new drug."
+        },
+        {
+          "level": 2,
+          "val": "Elevated with epigastric pain radiating to the back",
+          "disp": "Urgent evaluation."
+        },
+        {
+          "level": 3,
+          "val": "Elevated with vomiting, inability to keep fluids down, or hemodynamic change",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Alcohol, gallstones, hypertriglyceridemia, drugs, and in the case of amylase alone, salivary sources and renal impairment.",
+      "baseline": "Deliberately thin. This is unlikely to be tested on a specific number and is far more likely to appear as a direction of travel — rising or falling on serial results. Keep it to one or two items framed on the trend and on the fact that lipase is the more specific of the two. Do not write a normal-versus-abnormal classification item on these, because the range is not something the course supplies.",
+      "specimen": "Hemolysis interferes with amylase assays.",
+      "source": "Course textbook; laboratory-specific ranges"
+    },
+    {
+      "panel": "bmp",
+      "origin": "record",
+      "name": "Serum osmolality",
+      "units": "mOsm/kg",
+      "si": "—",
+      "ref": "Treat as a concept rather than a number on this course",
+      "variants": "Not applicable.",
+      "gap": true,
+      "bands": [
+        {
+          "level": 1,
+          "val": "Raised with a correspondingly high sodium or glucose",
+          "disp": "Explained by the measured solutes. Treat the underlying cause."
+        },
+        {
+          "level": 2,
+          "val": "Raised out of proportion to sodium, glucose and urea",
+          "disp": "Something osmotically active is present that has not been measured. Provider consult."
+        },
+        {
+          "level": 3,
+          "val": "Markedly raised with altered mentation",
+          "disp": "Emergent transport."
+        }
+      ],
+      "causes": "Dehydration, hyperglycemia, uremia, and ingested alcohols.",
+      "baseline": "The course textbook treats this conceptually and so should the bank. What matters is the idea that osmolality describes the concentration of the blood and is driven mainly by sodium, glucose and urea, so it rises with dehydration and with hyperglycemia. That makes it a useful way to explain why a hyperosmolar diabetic patient is profoundly dry, and why a dehydrated nursing-home resident is the classic case. Do not build numeric classification items here — there is no course-supplied range to classify against, and an item that invents one is a defect.",
+      "specimen": "Not applicable at the point of care.",
+      "source": "Course textbook, conceptual treatment"
+    }
+  ]
+}

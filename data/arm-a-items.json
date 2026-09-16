@@ -1,0 +1,1449 @@
+{
+  "_about": [
+    "Arm A item bank. Each item references a row in data/lab-master-table.json by its exact 'name' (field 'lab').",
+    "Reference range and source are resolved from that row at runtime and by the validator; items may override 'source' when a different source applies.",
+    "Numeric values are generator specs, not literals: {set, min, max, band} or {set, fixed, band}. 'band' 0 = the reference range; 1-3 = the master table's abnormality bands; named bands are defined in data/bands.json.",
+    "Placeholders {key} in stem, baseline, rationale and options are replaced with the generated number plus its unit.",
+    "type 'classify': answer is normal | abnormal | baseline (abnormal but this patient's baseline). Basic items offer two choices, advanced and fiendish three.",
+    "type 'mcq': options[] with exactly one correct: true. Options are shuffled in the browser. Keep choices parallel in length and detail; the correct answer must not stand out (see CLAUDE.md, item-writing rules).",
+    "provenance: field (obtainable at the bedside) or record (record review or send-out). domain: IBSC CP-C content outline code.",
+    "All text is U.S. English. The validator rejects British spellings."
+  ],
+  "items": [
+
+    {"id":"glu-b-01","lab":"Glucose","level":"basic","type":"classify","provenance":"field","domain":"3p",
+     "stem":"A 60-year-old with no diagnosis of diabetes has a fasting fingerstick glucose of {value} at a routine home visit.",
+     "values":{"value":{"set":"mg/dL","min":76,"max":94,"band":0}},
+     "answer":"normal",
+     "rationale":"The course textbook fasting range is 70–100 mg/dL. {value} sits comfortably inside it. The two-hour post-prandial limit of 140 mg/dL does not apply to a fasting sample."},
+
+    {"id":"glu-b-02","lab":"Glucose","level":"basic","type":"classify","provenance":"field","domain":"3p",
+     "stem":"A 68-year-old with type 2 diabetes has a fasting fingerstick glucose of {value}.",
+     "values":{"value":{"set":"mg/dL","min":260,"max":380,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Well above the 70–100 mg/dL fasting range. In the table this is band 2 (250–399 without ketones): a provider consult, not automatically a transport. Whether it is this patient's usual level is the advanced question; at this level the value is simply abnormal."},
+
+    {"id":"glu-b-03","lab":"Glucose","level":"basic","type":"classify","provenance":"field","domain":"3p",
+     "stem":"A 79-year-old on glipizide reports feeling shaky before breakfast. Fingerstick glucose is {value}.",
+     "values":{"value":{"set":"mg/dL","min":52,"max":64,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below the 70 mg/dL lower limit of the fasting range. Band 1 (50–69): treat and recheck. A sulfonylurea is the classic cause in an older patient who skipped or delayed a meal."},
+
+    {"id":"na-b-01","lab":"Sodium","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT CHEM8+ on a 74-year-old at a scheduled visit: sodium {value}.",
+     "values":{"value":{"set":"default","min":137,"max":141,"band":0}},
+     "answer":"normal",
+     "rationale":"The course textbook sodium range is 136–142 mEq/L. Note the textbook range is narrower than most laboratory reports (135–145); this value is normal on either."},
+
+    {"id":"na-b-02","lab":"Sodium","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on an 81-year-old who has been eating poorly for a week: sodium {value}.",
+     "values":{"value":{"set":"default","min":125,"max":129,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Below the 136 mEq/L lower limit. Band 2 (125–129): same-day provider consult, review diuretics, free-water intake and any new SSRI. A tea-and-toast diet in a frail patient is a textbook cause."},
+
+    {"id":"na-b-03","lab":"Sodium","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on a 90-year-old nursing-home resident with reduced oral intake: sodium {value}.",
+     "values":{"value":{"set":"default","min":150,"max":155,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 142 mEq/L upper limit. Band 2 (150–155): same-day provider consult. Hypernatremia in a dependent older adult almost always means inadequate water intake."},
+
+    {"id":"k-b-01","lab":"Potassium","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on a 66-year-old taking lisinopril: potassium {value}.",
+     "values":{"value":{"set":"default","min":3.8,"max":4.8,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the 3.5–5.0 mEq/L range. An ACE inhibitor raises potassium, which is why it is checked, but this value needs no action."},
+
+    {"id":"k-b-02","lab":"Potassium","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on a 72-year-old with chronic kidney disease on spironolactone: potassium {value}. The specimen was drawn cleanly.",
+     "values":{"value":{"set":"default","min":5.7,"max":6.3,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 5.0 mEq/L upper limit. Band 2 (5.6–6.4): urgent same-day evaluation with an ECG. Peaked T waves or a widening QRS at this level escalate to emergent."},
+
+    {"id":"k-b-03","lab":"Potassium","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on a 70-year-old with three days of diarrhea who takes furosemide daily: potassium {value}.",
+     "values":{"value":{"set":"default","min":2.5,"max":2.9,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Below the 3.5 mEq/L lower limit. Band 2 (2.5–2.9): urgent same-day evaluation and an ECG. GI losses on top of a loop diuretic is the usual combination."},
+
+    {"id":"hco3-b-01","lab":"Bicarbonate / total CO2","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT total CO2 on a 58-year-old with well-controlled hypertension: {value}.",
+     "values":{"value":{"set":"default","min":23,"max":26,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the course textbook bicarbonate range of 21–28 mEq/L."},
+
+    {"id":"hco3-b-02","lab":"Bicarbonate / total CO2","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on a 64-year-old with type 1 diabetes who has been vomiting since yesterday: bicarbonate {value}.",
+     "values":{"value":{"set":"default","min":15,"max":17,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Below the 21 mEq/L lower limit. Band 2 (15–17): provider consult. A falling bicarbonate is the earliest numeric sign of an evolving metabolic acidosis and often precedes any vital-sign change; in a type 1 diabetic who is vomiting, check ketones now."},
+
+    {"id":"bun-b-01","lab":"BUN","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on a 55-year-old at an annual wellness visit: BUN {value}.",
+     "values":{"value":{"set":"default","min":10,"max":19,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the course textbook range of 8–23 mg/dL."},
+
+    {"id":"bun-b-02","lab":"BUN","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on an 84-year-old who has stopped drinking fluids because of a sore mouth: BUN {value}.",
+     "values":{"value":{"set":"default","min":38,"max":58,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 23 mg/dL upper limit. Band 2 (36–60): provider consult if new or rising. Interpret it against the creatinine as a ratio; an isolated BUN rise in a patient who has stopped drinking points to a prerenal cause."},
+
+    {"id":"cr-b-01","lab":"Creatinine","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on a 62-year-old with hypertension: creatinine {value}.",
+     "baseline":"Documented baseline creatinine {baseline} from the last clinic visit.",
+     "values":{"value":{"set":"default","min":0.80,"max":0.95,"step":0.01,"band":0},"baseline":{"set":"default","fixed":0.90,"context":true}},
+     "answer":"normal",
+     "rationale":"Inside the course textbook range of 0.6–1.2 mg/dL and within a few percent of the patient's baseline. Creatinine is never interpreted without a baseline, which is why every creatinine item states one."},
+
+    {"id":"cr-b-02","lab":"Creatinine","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT on a 77-year-old who started ibuprofen for knee pain ten days ago: creatinine {value}.",
+     "baseline":"Documented baseline creatinine {baseline} three months ago.",
+     "values":{"value":{"set":"default","min":1.70,"max":2.40,"step":0.1,"band":3},"baseline":{"set":"default","fixed":1.00,"context":true}},
+     "answer":"abnormal",
+     "rationale":"Above the 1.2 mg/dL upper limit and more than 50% above the patient's baseline (band 3): urgent or emergent evaluation. An NSAID in an older patient is a classic cause of acute kidney injury."},
+
+    {"id":"ca-b-01","lab":"Calcium — ionized","level":"basic","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"Total calcium on a 59-year-old's recent metabolic panel: {value}.",
+     "values":{"value":{"set":"total","min":8.8,"max":10.2,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the total calcium range of 8.5–10.5 mg/dL. Albumin correction only matters when the albumin is low."},
+
+    {"id":"ca-b-02","lab":"Calcium — ionized","level":"basic","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"Total calcium on a 71-year-old with metastatic breast cancer who has become constipated: {value}. Albumin is normal.",
+     "values":{"value":{"set":"total","min":11.2,"max":12.8,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 10.5 mg/dL upper limit with a normal albumin, so no correction is needed. Band 2 (11.1–13.0): provider consult. Hypercalcemia of malignancy is the case a community paramedic is most likely to meet."},
+
+    {"id":"ph-b-01","lab":"pH","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT CG4+ venous gas on a 48-year-old asthmatic between attacks: pH {value}.",
+     "values":{"value":{"set":"default","min":7.37,"max":7.43,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside 7.35–7.45."},
+
+    {"id":"ph-b-02","lab":"pH","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT CG4+ on a 63-year-old with a two-day history of vomiting and diarrhea: pH {value}.",
+     "values":{"value":{"set":"default","min":7.25,"max":7.31,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Below the 7.35 lower limit. Band 2 (7.25–7.31): urgent evaluation unless it matches a documented baseline. Interpret with pCO2 and bicarbonate to decide whether it is respiratory or metabolic."},
+
+    {"id":"pco2-b-01","lab":"pCO2","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT CG4+ on a 50-year-old with anxiety, now calm: pCO2 {value}.",
+     "values":{"value":{"set":"default","min":37,"max":43,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside 35–45 mmHg."},
+
+    {"id":"pco2-b-02","lab":"pCO2","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT CG4+ on a 69-year-old with severe COPD: pCO2 {value}.",
+     "values":{"value":{"set":"default","min":52,"max":58,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 45 mmHg upper limit. Whether it is chronic (compensated, with a raised bicarbonate and near-normal pH) or acute decides the disposition; that is the advanced question. The value itself is abnormal."},
+
+    {"id":"lac-b-01","lab":"Lactate","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT CG4+ on a 45-year-old with a mild cellulitis: lactate {value}.",
+     "values":{"value":{"set":"mg/dL","min":6,"max":13,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the course textbook range of 5–15 mg/dL. Note the units: the textbook reports lactate in mg/dL, while sepsis guidance uses mmol/L. Read the units before the number."},
+
+    {"id":"lac-b-02","lab":"Lactate","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT CG4+ on a 78-year-old with a fever and new confusion: lactate {value}.",
+     "values":{"value":{"set":"mg/dL","min":40,"max":70,"band":3}},
+     "answer":"abnormal",
+     "rationale":"Well above the 15 mg/dL upper limit. Band 3 (36 mg/dL or above, roughly 4 mmol/L): emergent transport regardless of how the patient looks."},
+
+    {"id":"lac-b-03","lab":"Lactate","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"A hospital discharge summary reports a lactate of {value} on the day of discharge.",
+     "values":{"value":{"set":"mmol/L","min":0.7,"max":1.5,"band":0}},
+     "answer":"normal",
+     "rationale":"In mmol/L the normal range is roughly 0.6–1.7 (the textbook's 5–15 mg/dL divided by 9). Normal."},
+
+    {"id":"hgb-b-01","lab":"Hemoglobin","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"HemoCue on a 58-year-old man at a routine visit: hemoglobin {value}.",
+     "baseline":"Prior hemoglobin {baseline} three months ago.",
+     "values":{"value":{"set":"male","min":14.6,"max":17.4,"band":0},"baseline":{"set":"male","fixed":15.1,"context":true}},
+     "answer":"normal",
+     "rationale":"Inside the male range of 14–18 g/dL and unchanged from baseline."},
+
+    {"id":"hgb-b-02","lab":"Hemoglobin","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"HemoCue on a 70-year-old woman who reports black stools: hemoglobin {value}.",
+     "baseline":"Prior hemoglobin {baseline} six weeks ago.",
+     "values":{"value":{"set":"female","min":7.2,"max":9.6,"band":2},"baseline":{"set":"female","fixed":12.8,"context":true}},
+     "answer":"abnormal",
+     "rationale":"Below the female range of 12–16 g/dL and more than 2 g/dL below baseline. With melena the table escalates this to emergent transport regardless of the band."},
+
+    {"id":"inr-b-01","lab":"INR","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"POC INR on a 52-year-old who takes no anticoagulant: INR {value}.",
+     "values":{"value":{"set":"off","min":0.8,"max":1.1,"band":0}},
+     "answer":"normal",
+     "rationale":"Off anticoagulation the course textbook range is 0.8–1.1."},
+
+    {"id":"inr-b-02","lab":"INR","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"POC INR on a 76-year-old taking warfarin for atrial fibrillation: INR {value}.",
+     "values":{"value":{"set":"warfarin","min":2.2,"max":2.8,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the therapeutic target of 2.0–3.0 for a patient on warfarin. On warfarin, 'normal' means 'in the target range', not 0.8–1.1."},
+
+    {"id":"inr-b-03","lab":"INR","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"POC INR on a 79-year-old on warfarin who has no bleeding: INR {value}.",
+     "values":{"value":{"set":"warfarin","min":5.0,"max":8.5,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Well above the 2.0–3.0 target. Band 2 (4.5–9.0, no bleeding): hold warfarin, provider consult, recheck within 24–48 hours. Still not automatically a transport."},
+
+    {"id":"bnp-b-01","lab":"BNP","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT BNP on a 67-year-old with heart failure who feels well: {value}.",
+     "baseline":"Last clinic BNP {baseline} at dry weight.",
+     "values":{"value":{"set":"default","min":30,"max":170,"band":0},"baseline":{"set":"default","fixed":140,"context":true}},
+     "answer":"normal",
+     "rationale":"Under 200 pg/mL, which the course textbook describes as compensated heart failure, and close to the patient's dry-weight baseline."},
+
+    {"id":"bnp-b-02","lab":"BNP","level":"basic","type":"classify","provenance":"field","domain":"3e",
+     "stem":"i-STAT BNP on a 74-year-old with heart failure and three days of worsening ankle swelling: {value}.",
+     "baseline":"Dry-weight baseline BNP {baseline}.",
+     "values":{"value":{"set":"default","min":480,"max":1400,"band":2},"baseline":{"set":"default","fixed":210,"context":true}},
+     "answer":"abnormal",
+     "rationale":"Above 400 pg/mL, which the textbook stages as moderate to severe, and well above this patient's baseline. Band 2: provider consult for a diuretic adjustment or urgent referral. Frequently still manageable at home."},
+
+    {"id":"wbc-b-01","lab":"White blood cell count","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Send-out CBC reviewed at a follow-up visit on a 61-year-old: white cell count {value}.",
+     "values":{"value":{"set":"default","min":5.0,"max":10.0,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside 4.5–11.0 ×10⁹/L (4,500–11,000/µL in the course textbook's notation)."},
+
+    {"id":"wbc-b-02","lab":"White blood cell count","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Send-out CBC on a 73-year-old with a productive cough and a fever: white cell count {value}.",
+     "values":{"value":{"set":"default","min":16.0,"max":28.0,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 11.0 ×10⁹/L upper limit. Band 2 (15.1–30.0): urgent evaluation, particularly with a fever or an identified source."},
+
+    {"id":"plt-b-01","lab":"Platelet count","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Discharge CBC on a 66-year-old who drinks heavily: platelet count {value}. No bruising or bleeding.",
+     "values":{"value":{"set":"default","min":55,"max":95,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Below the 150 ×10⁹/L lower limit. Band 2 (50–99): provider consult; review heparin exposure, new drugs and alcohol."},
+
+    {"id":"aptt-b-01","lab":"aPTT","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Hospital coagulation panel on a 70-year-old: aPTT {value}.",
+     "values":{"value":{"set":"default","min":48,"max":68,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the course textbook range of 25–40 seconds. Band 2 (46–70): provider consult if unexpected. Unfractionated heparin, liver disease and factor deficiencies prolong it."},
+
+    {"id":"dd-b-01","lab":"D-dimer","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Send-out D-dimer on a 55-year-old with calf pain and a low pretest probability: {value}.",
+     "values":{"value":{"set":"default","min":120,"max":400,"band":0}},
+     "answer":"normal",
+     "rationale":"Below the conventional 500 ng/mL FEU cutoff. With low pretest probability this effectively excludes DVT and PE."},
+
+    {"id":"trop-b-01","lab":"Troponin","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A discharge summary after a syncope work-up reports a troponin of {value}.",
+     "baseline":"Prior troponin {baseline} last year; no cardiac history.",
+     "values":{"value":{"set":"default","min":0.00,"max":0.02,"band":0},"baseline":{"set":"default","fixed":0.01,"context":true}},
+     "answer":"normal",
+     "rationale":"Inside the course textbook range of 0–0.4 ng/mL and unchanged from baseline."},
+
+    {"id":"trop-b-02","lab":"Troponin","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A discharge summary after a treated myocardial infarction reports a peak troponin of {value}.",
+     "baseline":"Prior troponin {baseline} two years ago.",
+     "values":{"value":{"set":"default","min":0.8,"max":6.0,"step":0.1,"band":1},"baseline":{"set":"default","fixed":0.01,"context":true}},
+     "answer":"abnormal",
+     "rationale":"Above the 0.4 ng/mL upper limit, so the value is abnormal. It is also historical: band 1, a peak from an event already treated. What to do about it is the advanced question."},
+
+    {"id":"egfr-b-01","lab":"eGFR","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Recent metabolic panel on a 45-year-old: eGFR {value}.",
+     "values":{"value":{"set":"default","min":96,"max":115,"band":0}},
+     "answer":"normal",
+     "rationale":"90 mL/min/1.73m² or above is normal."},
+
+    {"id":"egfr-b-02","lab":"eGFR","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Recent metabolic panel on a 78-year-old with diabetes: eGFR {value}.",
+     "values":{"value":{"set":"default","min":31,"max":43,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Below 90 mL/min/1.73m². Stage 3b (30–44), band 2: provider consult on dose adjustment; review NSAIDs, anticoagulant dosing and every renally cleared drug on the list."},
+
+    {"id":"mg-b-01","lab":"Magnesium","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Send-out chemistry on a 68-year-old on long-term omeprazole and furosemide: magnesium {value}.",
+     "values":{"value":{"set":"default","min":1.0,"max":1.3,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Below the 1.7 mg/dL lower limit. Band 2 (1.0–1.4): provider consult; check a potassium and an ECG. Proton pump inhibitors and loop diuretics together are the usual cause."},
+
+    {"id":"phos-b-01","lab":"Phosphate","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Send-out chemistry on a 60-year-old: phosphate {value}.",
+     "values":{"value":{"set":"default","min":2.8,"max":4.2,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside 2.5–4.5 mg/dL."},
+
+    {"id":"alb-b-01","lab":"Albumin","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Discharge chemistry on an 82-year-old with a slow-healing pressure injury: albumin {value}.",
+     "values":{"value":{"set":"default","min":2.5,"max":2.9,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Below the 3.5 g/dL lower limit. Band 2 (2.5–2.9): provider and dietitian involvement; flag wound-healing risk. Never a transport."},
+
+    {"id":"alt-b-01","lab":"Liver enzymes, alkaline phosphatase and bilirubin","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Discharge chemistry on a 54-year-old started on atorvastatin: ALT {value}.",
+     "values":{"value":{"set":"ALT","min":12,"max":34,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the course textbook ALT range of 10–40 U/L."},
+
+    {"id":"alt-b-02","lab":"Liver enzymes, alkaline phosphatase and bilirubin","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Discharge chemistry on a 47-year-old with alcohol use disorder: ALT {value}.",
+     "values":{"value":{"set":"ALT","min":140,"max":370,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Between three and ten times the 40 U/L upper limit: band 2, provider consult. Review alcohol, acetaminophen and statin use."},
+
+    {"id":"nh3-b-01","lab":"Ammonia","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Discharge chemistry on a 61-year-old with cirrhosis: ammonia {value}.",
+     "values":{"value":{"set":"default","min":90,"max":140,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 45 µg/dL upper limit. Band 2 (81–150): provider consult, but the disposition turns on mental status and the precipitant, not the number."},
+
+    {"id":"b12-b-01","lab":"Hematinics — ferritin, B12, vitamin D","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Send-out hematinics on a 72-year-old on long-term metformin: vitamin B12 {value}.",
+     "values":{"value":{"set":"B12","min":90,"max":150,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below the 200 pg/mL lower limit. Band 1: care-plan item, replacement and a recheck interval. Long-term metformin depletes B12."},
+
+    {"id":"ferr-b-01","lab":"Hematinics — ferritin, B12, vitamin D","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Send-out hematinics on a 64-year-old with fatigue: ferritin {value}.",
+     "values":{"value":{"set":"ferritin","min":60,"max":300,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside 30–400 ng/mL. Remember ferritin is an acute-phase reactant; a normal value in an inflamed patient does not exclude iron deficiency."},
+
+    {"id":"a1c-b-01","lab":"HbA1c","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Clinic record on a 50-year-old with no diabetes diagnosis: HbA1c {value}.",
+     "values":{"value":{"set":"default","min":4.4,"max":5.3,"band":0}},
+     "answer":"normal",
+     "rationale":"Under 5.7% is normal; 5.7–6.4% is prediabetes; 6.5% or above is diagnostic of diabetes."},
+
+    {"id":"a1c-b-02","lab":"HbA1c","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Clinic record on a 58-year-old with type 2 diabetes: HbA1c {value}.",
+     "values":{"value":{"set":"default","min":10.5,"max":13.5,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Far above the diagnostic threshold and above 10%: band 2, provider consult on a regimen change and a review of what changed at home. An HbA1c never generates an emergency."},
+
+    {"id":"tsh-b-01","lab":"TSH","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Clinic record on a 63-year-old on levothyroxine: TSH {value}.",
+     "values":{"value":{"set":"default","min":0.6,"max":3.4,"step":0.1,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside 0.4–4.0 mIU/L. The replacement dose is adequate."},
+
+    {"id":"tsh-b-02","lab":"TSH","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Clinic record on a 71-year-old with fatigue and constipation: TSH {value}.",
+     "values":{"value":{"set":"default","min":12.0,"max":45.0,"step":0.5,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 4.0 mIU/L upper limit and above 10: band 2, provider consult on a dose change. Untreated hypothyroidism is easily written off as aging."},
+
+    {"id":"dig-b-01","lab":"Therapeutic drug levels — digoxin, vancomycin","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Clinic record on a 79-year-old on digoxin for atrial fibrillation, level drawn eight hours post-dose: digoxin {value}.",
+     "values":{"value":{"set":"digoxin","min":1.0,"max":1.8,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the exam reference range of 0.8–2.0 ng/mL. Note the era conflict in the table: current heart-failure practice targets 0.5–0.9, so a level in this range is exam-therapeutic and clinically high."},
+
+    {"id":"dig-b-02","lab":"Therapeutic drug levels — digoxin, vancomycin","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Clinic record on an 84-year-old on digoxin, level correctly timed: digoxin {value}.",
+     "values":{"value":{"set":"digoxin","min":2.7,"max":3.4,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the 2.0 ng/mL upper limit. Band 2 (2.6–3.5): urgent evaluation. Symptoms outrank the number; check potassium, magnesium and renal function."},
+
+    {"id":"pt-b-01","lab":"Prothrombin time","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Hospital coagulation panel on a 68-year-old: prothrombin time {value}.",
+     "values":{"value":{"set":"default","min":19,"max":24,"band":2}},
+     "answer":"abnormal",
+     "rationale":"Above the course textbook range of 10–13 seconds. Band 2 (18–25): provider consult, driven by the corresponding INR. The raw PT is reagent-dependent, which is why the INR exists."},
+
+    {"id":"ck-b-01","lab":"Creatine kinase","level":"basic","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Send-out chemistry on a 57-year-old on a statin who reports no muscle symptoms: creatine kinase {value}.",
+     "values":{"value":{"set":"default","min":50,"max":125,"band":0}},
+     "answer":"normal",
+     "rationale":"Inside the course textbook range of 40–150 U/L."},
+
+    {"id":"ph-adv-01","lab":"pH","level":"advanced","type":"mcq","provenance":"field","domain":"3ff",
+     "stem":"A 71-year-old with severe COPD on home oxygen is at his usual level of breathlessness. i-STAT venous gas: pH {value}, pCO2 {pco2}, bicarbonate {hco3}. Which best describes this gas?",
+     "values":{"value":{"set":"default","min":7.36,"max":7.38,"band":0},"pco2":{"lab":"pCO2","set":"default","min":55,"max":60,"band":2},"hco3":{"lab":"Bicarbonate / total CO2","set":"default","min":31,"max":33,"band":1}},
+     "options":[
+       {"text":"Chronic respiratory acidosis, fully compensated","correct":true},
+       {"text":"Acute respiratory acidosis with early compensation"},
+       {"text":"Metabolic alkalosis, partially compensated"},
+       {"text":"Mixed respiratory and metabolic acidosis"}
+     ],
+     "rationale":"The flagship case of the bank. The pH is inside range because the bicarbonate has risen to match a chronically raised pCO2. Compensated means chronic. A medic reads the pCO2 and wants to assist ventilation; the correct action is to document this as baseline. The pathological version is acute-on-chronic: pH under 7.30 with a pCO2 that has risen faster than the bicarbonate could follow."},
+
+    {"id":"pco2-adv-01","lab":"pCO2","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 68-year-old CO2 retainer is drowsier than usual today. i-STAT venous gas: pH {ph}, pCO2 {value}, bicarbonate {hco3}. Disposition?",
+     "values":{"value":{"set":"default","min":66,"max":78,"band":3},"ph":{"lab":"pH","set":"default","min":7.20,"max":7.24,"band":3},"hco3":{"lab":"Bicarbonate / total CO2","set":"default","min":24,"max":26,"band":0}},
+     "options":[
+       {"text":"Document as his known baseline and revisit next week"},
+       {"text":"Emergent transport for acute-on-chronic respiratory failure","correct":true},
+       {"text":"Same-day provider consult for a course of steroids"},
+       {"text":"Nebulizer treatment in place and recheck tomorrow"}
+     ],
+     "rationale":"The bicarbonate is not raised, so the kidneys have not had time to compensate: this pCO2 rise is new. pH under 7.30 with a pCO2 over 60 and falling mentation is band 3. The word 'retainer' in the history is the trap; the gas says acute."},
+
+    {"id":"na-adv-01","lab":"Sodium","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 79-year-old with chronic heart failure has an i-STAT sodium of {value}. She is alert, oriented and at her usual functional level.",
+     "baseline":"Sodium has been between 126 and 129 mEq/L on every panel for the past two years.",
+     "values":{"value":{"set":"default","min":126,"max":129,"band":2}},
+     "answer":"baseline",
+     "rationale":"Numerically band 2, but the value is stable and matches two years of records. Rate of change outranks the absolute number. Correcting chronic hyponatremia quickly risks osmotic demyelination, which is why the answer to a stable 128 is never a fluid bolus."},
+
+    {"id":"na-adv-02","lab":"Sodium","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 79-year-old started hydrochlorothiazide four days ago and is now mildly confused. i-STAT sodium {value}.",
+     "baseline":"Sodium was 140 mEq/L on a panel drawn the day the thiazide was started.",
+     "values":{"value":{"set":"default","min":126,"max":129,"band":2}},
+     "answer":"abnormal",
+     "rationale":"The same number as a stable chronic patient, but this one has fallen from 140 in four days on a new thiazide, with symptoms. That is an acute change and band 2 at minimum: same-day provider consult, and with marked confusion the table escalates to emergent."},
+
+    {"id":"k-adv-01","lab":"Potassium","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 64-year-old on hemodialysis is seen on a non-dialysis day. He feels well. i-STAT potassium {value}, clean draw, ECG unchanged from his last tracing.",
+     "baseline":"Pre-dialysis potassium runs 5.3–5.6 mEq/L on his unit's records.",
+     "values":{"value":{"set":"default","min":5.4,"max":5.5,"band":1}},
+     "answer":"baseline",
+     "rationale":"Above the 5.0 mEq/L limit but expected for a dialysis patient between sessions and matching his records. Medics trained on acute hyperkalemia read 5.4 as a crisis. The dangerous version is the CKD patient recently started on spironolactone or an ARB, where the number climbs over days."},
+
+    {"id":"k-adv-02","lab":"Potassium","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 72-year-old with CKD stage 3 was started on spironolactone two weeks ago and takes lisinopril. i-STAT potassium {value}, clean draw.",
+     "baseline":"Potassium was 4.6 mEq/L before the spironolactone was started.",
+     "values":{"value":{"set":"default","min":5.7,"max":6.2,"band":2}},
+     "answer":"abnormal",
+     "rationale":"A rise of more than a full mEq/L over two weeks on two potassium-raising drugs in a patient with reduced GFR. Band 2: urgent same-day evaluation with an ECG. This is not a baseline; it is a trajectory."},
+
+    {"id":"k-adv-03","lab":"Potassium","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 75-year-old with CKD stage 3 on lisinopril started ibuprofen and an over-the-counter potassium supplement last week. i-STAT potassium {value}, clean draw. She feels well. Best action?",
+     "values":{"value":{"set":"default","min":5.8,"max":6.3,"band":2}},
+     "options":[
+       {"text":"Recheck the potassium at next week's scheduled visit"},
+       {"text":"Encourage oral fluids and repeat the level in one hour"},
+       {"text":"Stop the supplement and the NSAID; recheck in three days"},
+       {"text":"Same-day evaluation with a 12-lead ECG performed right now","correct":true}
+     ],
+     "rationale":"Band 2 (5.6–6.4) requires an ECG and urgent evaluation. Stopping the supplement and the NSAID is part of the plan but does not replace the ECG. Any two of ACE inhibitor, NSAID, potassium supplement and declining GFR together is the table's named danger combination. Symptoms are absent in most hyperkalemia until the ECG changes."},
+
+    {"id":"hco3-adv-01","lab":"Bicarbonate / total CO2","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 70-year-old with severe COPD is seen for a routine visit and is at his usual breathlessness. i-STAT bicarbonate {value}.",
+     "baseline":"Bicarbonate has been 31–33 mEq/L on every gas for three years; pCO2 chronically in the high 50s.",
+     "values":{"value":{"set":"default","min":31,"max":33,"band":1}},
+     "answer":"baseline",
+     "rationale":"A COPD patient with a bicarbonate of 32 is not alkalotic. That is renal compensation for chronic hypercapnia and is the correct value for him. Reading it as a primary abnormality is a common error."},
+
+    {"id":"hgb-adv-01","lab":"Hemoglobin","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 68-year-old woman with CKD stage 4 on an erythropoiesis-stimulating agent. HemoCue hemoglobin {value}. No bleeding, no new symptoms.",
+     "baseline":"Hemoglobin has sat between 9.2 and 9.8 g/dL for eighteen months on her nephrology records.",
+     "values":{"value":{"set":"female","min":9.2,"max":9.8,"band":2}},
+     "answer":"baseline",
+     "rationale":"Numerically band 2, but stable and documented for eighteen months. Chronic anemia of renal disease lives here and needs no acute action. The same 9.5 in a patient who was 13 a month ago is an occult bleed."},
+
+    {"id":"hgb-adv-02","lab":"Hemoglobin","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 68-year-old man who takes naproxen daily for back pain is more tired than usual. HemoCue hemoglobin {value}. No visible bleeding.",
+     "baseline":"Hemoglobin was 13.6 g/dL one month ago.",
+     "values":{"value":{"set":"male","min":9.2,"max":9.8,"band":2}},
+     "answer":"abnormal",
+     "rationale":"A fall of more than 2 g/dL in a month on a daily NSAID is an occult bleed until proven otherwise. Band 2 with a recent fall: urgent evaluation, look for a source. Absolute value alone could not have separated this from the CKD patient at the same number."},
+
+    {"id":"cr-adv-01","lab":"Creatinine","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 74-year-old with CKD stage 4. i-STAT creatinine {value}. He feels well and his weight is stable.",
+     "baseline":"Documented baseline creatinine {baseline}, stable over the past year.",
+     "values":{"value":{"set":"default","min":1.90,"max":2.10,"step":0.05,"band":0},"baseline":{"set":"default","fixed":2.00,"context":true}},
+     "answer":"baseline",
+     "rationale":"Far above the 0.6–1.2 mg/dL range but within a few percent of a documented baseline. Nothing in the table is more baseline-dependent than creatinine: 2.1 is alarming in someone whose baseline is 0.9 and unremarkable in stage 4 CKD whose baseline is 2.0."},
+
+    {"id":"cr-adv-02","lab":"Creatinine","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 74-year-old was discharged four days ago after a CT with contrast and has been taking ibuprofen for back pain. i-STAT creatinine {value}.",
+     "baseline":"Documented baseline creatinine {baseline} on admission.",
+     "values":{"value":{"set":"default","min":1.60,"max":2.00,"step":0.05,"band":3},"baseline":{"set":"default","fixed":0.90,"context":true}},
+     "answer":"abnormal",
+     "rationale":"More than 50% above baseline: band 3, urgent or emergent evaluation. Contrast plus an NSAID in an older patient is a classic acute kidney injury. The same absolute number would be baseline for a stage 4 CKD patient."},
+
+    {"id":"cr-adv-03","lab":"Creatinine","level":"advanced","type":"mcq","provenance":"field","domain":"3jj",
+     "stem":"A 70-year-old with CKD stage 3 started lisinopril two weeks ago. i-STAT creatinine {value}. Potassium is normal and he feels well. Best action?",
+     "baseline":"Documented baseline creatinine {baseline} before the lisinopril.",
+     "values":{"value":{"set":"default","min":1.60,"max":1.70,"step":0.05,"band":1},"baseline":{"set":"default","fixed":1.40,"context":true}},
+     "options":[
+       {"text":"Continue lisinopril; recheck at the set interval","correct":true},
+       {"text":"Hold lisinopril until the creatinine returns to baseline"},
+       {"text":"Same-day evaluation for possible acute kidney injury"},
+       {"text":"Oral fluid challenge and recheck in two hours"}
+     ],
+     "rationale":"A rise of up to about 30% after starting an ACE inhibitor is expected and is not a reason to stop the drug. This rise is under 25%, band 1: trend it. Stopping a renoprotective drug for an expected effect is the error the item targets."},
+
+    {"id":"bun-adv-01","lab":"BUN","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"An 86-year-old living alone has been off her feet with a cold and drinking little. i-STAT: BUN {value}, creatinine {cr}. She is alert, tolerating oral fluids, and has a daughter visiting daily. Most likely picture and disposition?",
+     "baseline":"Documented baseline creatinine {crb}.",
+     "values":{"value":{"set":"default","min":38,"max":52,"band":2},"cr":{"lab":"Creatinine","set":"default","fixed":1.00,"band":0,"baselineKey":"crb"},"crb":{"lab":"Creatinine","set":"default","fixed":0.95,"context":true}},
+     "options":[
+       {"text":"Prerenal: oral rehydration at home, revisit in 24–48 hours","correct":true},
+       {"text":"Intrinsic renal injury: same-day evaluation for IV fluids"},
+       {"text":"Occult GI bleed: emergent transport for urgent endoscopy"},
+       {"text":"Normal for her age: no action beyond the routine follow-up visit"}
+     ],
+     "rationale":"The ratio is the teaching point. BUN divided by creatinine here is well above 20 to 1, which points to a prerenal cause, most often simple dehydration in a frail patient who has stopped drinking. The creatinine is at baseline. This is frequently correctable at home rather than an ED trip; medics have no framework for the ratio at all. A GI bleed also raises the ratio, but there is no melena or hemoglobin change in this stem."},
+
+    {"id":"glu-adv-01","lab":"Glucose","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 66-year-old with long-standing type 2 diabetes. Fingerstick glucose {value} this afternoon. Urine ketones negative, alert, no vomiting.",
+     "baseline":"His glucometer log shows 230–280 mg/dL at most readings for the past month.",
+     "values":{"value":{"set":"mg/dL","min":255,"max":280,"band":2}},
+     "answer":"baseline",
+     "rationale":"Poor control, not an emergency. A long-standing type 2 diabetic running 230–280 all day is a medication-adherence conversation and a provider consult about the regimen. Medics routinely over-transport this patient. Ketones are what separate this from evolving ketoacidosis."},
+
+    {"id":"glu-adv-02","lab":"Glucose","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 66-year-old with well-controlled type 2 diabetes feels unwell and has a fasting fingerstick glucose of {value}.",
+     "baseline":"His glucometer log shows 110–140 mg/dL on every reading for months.",
+     "values":{"value":{"set":"mg/dL","min":290,"max":380,"band":2}},
+     "answer":"abnormal",
+     "rationale":"A well-controlled patient who suddenly runs 300 has a new problem, usually infection, and the number matters less than the change. Band 2: provider consult, and look for the cause."},
+
+    {"id":"bnp-adv-01","lab":"BNP","level":"advanced","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 77-year-old with long-standing heart failure. i-STAT BNP {value}. Weight is at his dry weight, no orthopnea, oxygen saturation at his usual level.",
+     "baseline":"Dry-weight baseline BNP {baseline} on the last three clinic checks.",
+     "values":{"value":{"set":"default","min":550,"max":700,"band":2},"baseline":{"set":"default","fixed":600,"context":true}},
+     "answer":"baseline",
+     "rationale":"The textbook stages this as moderate to severe, but a single BNP does not separate acute decompensation from stable chronic disease. A patient living at 600 tells you nothing without his own dry-weight baseline, and this value matches it with a stable weight. Trending is the community paramedic's whole advantage here."},
+
+    {"id":"bnp-adv-02","lab":"BNP","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 72-year-old with heart failure has gained 2.5 kg in three days with new ankle swelling. i-STAT BNP {value}. Saturation normal, no orthopnea. Best next step?",
+     "baseline":"Dry-weight baseline BNP {baseline}.",
+     "values":{"value":{"set":"default","min":300,"max":380,"band":1},"baseline":{"set":"default","fixed":150,"context":true}},
+     "options":[
+       {"text":"Emergent transport for acute decompensated heart failure"},
+       {"text":"Weigh her, compare with dry-weight baseline, consult","correct":true},
+       {"text":"No change; a BNP under 400 is moderate heart failure"},
+       {"text":"Repeat the BNP in one week and decide on the diuretic then"}
+     ],
+     "rationale":"Band 1 is where a community paramedic earns their keep. The number has doubled from baseline and the weight has climbed, so something is changing, but there is no hypoxia, orthopnea or hypotension, so nothing in the table says transport. Weigh, review the diuretic dose, consult. The distractors are the two binary reflexes."},
+
+    {"id":"bnp-adv-03","lab":"BNP","level":"advanced","type":"mcq","provenance":"field","domain":"3ll",
+     "stem":"You are setting up a home monitoring plan for a patient with chronic heart failure. Which single measure best detects early decompensation at home?",
+     "baseline":"The patient's dry-weight baseline BNP is on file.",
+     "options":[
+       {"text":"Weekly point-of-care BNP at each home visit"},
+       {"text":"Daily oxygen saturation with a pulse oximeter"},
+       {"text":"Daily weight compared against a known dry weight","correct":true},
+       {"text":"Monthly clinic BNP with an ECG and chest film"}
+     ],
+     "rationale":"Daily weights beat a single BNP for detecting decompensation. BNP is a severity stage in the course textbook, and it does not cover trending; obesity lowers it and renal impairment raises it independently of the heart."},
+
+    {"id":"bnp-adv-04","lab":"BNP","level":"advanced","type":"mcq","provenance":"field","domain":"3ff",
+     "stem":"A 63-year-old with a body mass index of 42 and known heart failure reports worsening leg swelling and a 3 kg weight gain. i-STAT BNP {value}. How should the BNP be interpreted?",
+     "baseline":"Dry-weight baseline BNP {baseline}.",
+     "values":{"value":{"set":"default","min":120,"max":170,"band":0},"baseline":{"set":"default","fixed":90,"context":true}},
+     "options":[
+       {"text":"Below 200, so acute decompensation is unlikely"},
+       {"text":"Normal, so the swelling has a noncardiac cause"},
+       {"text":"Unreliable at this weight; send for a hospital assay"},
+       {"text":"Falsely reassuring; obesity suppresses the BNP","correct":true}
+     ],
+     "rationale":"Obesity suppresses BNP, sometimes substantially, giving a falsely reassuring number in exactly the population most likely to have heart failure. The value has also nearly doubled from baseline. Weigh, examine, consult; the number does not rule anything out."},
+
+    {"id":"trop-adv-01","lab":"Troponin","level":"advanced","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A 79-year-old with CKD stage 4 and chronic heart failure. His clinic record shows a troponin of {value} drawn last week at a routine review. No chest pain, no dyspnea beyond his usual, ECG unchanged.",
+     "baseline":"Troponin has been 0.5–0.9 ng/mL on three prior draws over two years.",
+     "values":{"value":{"set":"default","min":0.5,"max":0.9,"step":0.1,"band":2}},
+     "answer":"baseline",
+     "rationale":"Above the 0.4 ng/mL limit but stable across three prior draws in a patient with two conditions that chronically raise troponin. Band 2: likely his baseline, not a disposition trigger without a change. The delta does the diagnostic work, not the absolute number."},
+
+    {"id":"mg-adv-01","lab":"Magnesium","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 71-year-old on furosemide and omeprazole has had oral potassium chloride increased twice in three weeks. Today's i-STAT potassium is {k}. Best next step?",
+     "values":{"k":{"lab":"Potassium","set":"default","min":3.0,"max":3.2,"band":1}},
+     "options":[
+       {"text":"Increase the potassium chloride dose again"},
+       {"text":"Ask the provider for a magnesium level first","correct":true},
+       {"text":"Transport for intravenous potassium replacement"},
+       {"text":"Hold the furosemide and recheck in a week"}
+     ],
+     "rationale":"Refractory hypokalemia. Potassium cannot be corrected while magnesium is low, and a loop diuretic plus a proton pump inhibitor is the classic depleting combination. Medics meet magnesium only in eclampsia and torsades and have no framework for chronic depletion."},
+
+    {"id":"dig-adv-01","lab":"Therapeutic drug levels — digoxin, vancomycin","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"An 82-year-old on digoxin was started on furosemide at discharge two weeks ago. She now has nausea, poor appetite and is 'seeing things yellow'. Heart rate 48. Her last digoxin level, correctly timed, was {value}. Best interpretation?",
+     "values":{"value":{"set":"digoxin","min":1.4,"max":1.8,"band":0}},
+     "options":[
+       {"text":"Therapeutic level; the symptoms suggest a viral illness"},
+       {"text":"Therapeutic level; review at the next scheduled visit"},
+       {"text":"Toxicity despite the level; urgent evaluation today","correct":true},
+       {"text":"Level too low for toxicity; look for another cause"}
+     ],
+     "rationale":"A digoxin level inside the reference range does not exclude toxicity. Hypokalemia from a new loop diuretic, hypomagnesemia and falling renal function all potentiate the drug. Nausea, anorexia, yellow-green visual disturbance and new bradycardia are the classic presentation; the table's band 2 is any level with these symptoms. Check potassium, magnesium and creatinine."},
+
+    {"id":"dig-adv-02","lab":"Therapeutic drug levels — digoxin, vancomycin","level":"advanced","type":"mcq","provenance":"record","domain":"3f",
+     "stem":"A home-health nurse drew a digoxin level two hours after the morning dose. Result: {value}. The patient is asymptomatic with a regular pulse of 68. Best action?",
+     "values":{"value":{"set":"digoxin","min":2.7,"max":3.4,"band":2}},
+     "options":[
+       {"text":"Emergent transport for probable digoxin toxicity"},
+       {"text":"Hold the next three doses and recheck the level"},
+       {"text":"No action; the patient is asymptomatic with a normal pulse"},
+       {"text":"Consult; repeat the level six to eight hours post-dose","correct":true}
+     ],
+     "rationale":"Digoxin must be drawn at least six to eight hours post-dose or the result is uninterpretably high. A mistimed level is the commonest error in this category. Ignoring it is also wrong: the provider decides, with a valid level."},
+
+    {"id":"egfr-adv-01","lab":"eGFR","level":"advanced","type":"mcq","lengthException":true,"provenance":"record","domain":"3jj",
+     "stem":"Discharge medication reconciliation for a 69-year-old man on metformin, amlodipine, atorvastatin and aspirin. Discharge creatinine {cr}. Which medication needs review against this result?",
+     "baseline":"Documented baseline creatinine {crb} six months ago.",
+     "values":{"cr":{"lab":"Creatinine","set":"default","min":1.70,"max":1.85,"step":0.05,"band":2,"baselineKey":"crb"},"crb":{"lab":"Creatinine","set":"default","fixed":1.30,"context":true}},
+     "options":[
+       {"text":"Metformin","correct":true},
+       {"text":"Amlodipine"},
+       {"text":"Atorvastatin"},
+       {"text":"Aspirin"}
+     ],
+     "rationale":"The long-standing metformin contraindication is a creatinine at or above 1.5 mg/dL in men and 1.4 mg/dL in women, and that is the threshold the exam expects. The creatinine has also risen 25–50% from baseline (band 2), which meets an acute kidney injury definition: provider consult. Metformin is held during any acute illness that threatens perfusion because the risk is lactic acidosis."},
+
+    {"id":"egfr-adv-02","lab":"eGFR","level":"advanced","type":"mcq","lengthException":true,"provenance":"record","domain":"3jj",
+     "stem":"A 77-year-old's record shows an eGFR of {value}, down a stage from last year. Her medication list includes gabapentin, glipizide, allopurinol and amlodipine. Which drug needs no dose review at this eGFR?",
+     "values":{"value":{"set":"default","min":32,"max":42,"band":2}},
+     "options":[
+       {"text":"Gabapentin"},
+       {"text":"Glipizide"},
+       {"text":"Allopurinol"},
+       {"text":"Amlodipine","correct":true}
+     ],
+     "rationale":"eGFR is the number that governs drug dosing, which is why it belongs on every reconciliation item. Gabapentin, sulfonylureas, allopurinol and many antibiotics accumulate as clearance falls; amlodipine is cleared by the liver. A fall of a stage from baseline is band 2: provider consult on dose adjustment."},
+
+    {"id":"inr-adv-01","lab":"INR","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 78-year-old on warfarin for atrial fibrillation. POC INR {value}. No bleeding, no bruising, no falls. Disposition?",
+     "values":{"value":{"set":"warfarin","min":4.6,"max":6.5,"band":2}},
+     "options":[
+       {"text":"Hold warfarin, consult, recheck within 24–48 hours","correct":true},
+       {"text":"Emergent transport for reversal with vitamin K and plasma"},
+       {"text":"Continue the usual dose and recheck in one month"},
+       {"text":"Same-day clinic visit for a venous INR and a dose review"}
+     ],
+     "rationale":"An INR of 4.5–9.0 without bleeding means hold the dose, not call an ambulance. Oral vitamin K may be indicated but that is the provider's call. A paramedic's binary training offers no middle option and defaults to transport; the correct answer sits in the middle."},
+
+    {"id":"inr-adv-02","lab":"INR","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 70-year-old on warfarin for atrial fibrillation. POC INR {value}. No bleeding. Disposition?",
+     "values":{"value":{"set":"warfarin","min":3.3,"max":3.5,"band":1}},
+     "options":[
+       {"text":"Same-day evaluation with a confirmatory venous INR"},
+       {"text":"Hold or adjust per protocol; recheck at home in a few days","correct":true},
+       {"text":"Oral vitamin K now and recheck the INR tomorrow"},
+       {"text":"No change; the value is within the target range"}
+     ],
+     "rationale":"Up to 0.5 above the 2.0–3.0 target with no bleeding is band 1: a leave-at-home decision with a dose adjustment per protocol. It is above target, so 'no change' is wrong, but nothing here needs an ED."},
+
+    {"id":"inr-adv-03","lab":"INR","level":"advanced","type":"mcq","provenance":"field","domain":"3ff",
+     "stem":"A referral note says only: 'INR {value}, please assess.' What must you know before you can classify this value?",
+     "values":{"value":{"set":"warfarin","min":2.4,"max":2.7,"band":0}},
+     "options":[
+       {"text":"The platelet count from the same blood draw"},
+       {"text":"Whether the sample was capillary or venous blood"},
+       {"text":"Whether she takes warfarin, and the indication","correct":true},
+       {"text":"The time elapsed since her last warfarin dose"}
+     ],
+     "rationale":"An INR of 2.6 is normal (0.8–1.1) for nobody and therapeutic for a patient on warfarin. The course textbook gives a single target of 2.0–3.0; clinically the target is indication-specific. An item that gives an INR without the indication cannot be answered."},
+
+    {"id":"warf-adv-01","lab":"Warfarin — dietary and drug influences on the INR","level":"advanced","type":"mcq","provenance":"field","domain":"3jj",
+     "stem":"A 68-year-old on a stable warfarin dose has a POC INR of {value}, down from a steady 2.5. No bleeding, no missed doses, no new medications. She mentions she has 'finally started eating healthy' with a big salad every day. Most likely explanation?",
+     "values":{"value":{"lab":"INR","set":"warfarin","min":1.5,"max":1.7,"band":1}},
+     "options":[
+       {"text":"More dietary vitamin K is antagonizing the warfarin","correct":true},
+       {"text":"Less dietary vitamin K is potentiating the warfarin"},
+       {"text":"A recent antibiotic course has raised her sensitivity"},
+       {"text":"Acetaminophen use has increased her clearance"}
+     ],
+     "rationale":"The direction is what students get backwards. Vitamin K is the antidote to warfarin, so more vitamin K means less anticoagulation and a lower INR. A patient who has taken up eating salads is subtherapeutic and at thrombotic risk. Antibiotics and acetaminophen raise the INR."},
+
+    {"id":"warf-adv-02","lab":"Warfarin — dietary and drug influences on the INR","level":"advanced","type":"mcq","provenance":"field","domain":"3jj",
+     "stem":"A 74-year-old on warfarin finished a course of trimethoprim-sulfamethoxazole for a urinary infection last week. POC INR {value}, up from 2.4. No bleeding. Most likely explanation?",
+     "values":{"value":{"lab":"INR","set":"warfarin","min":4.6,"max":6.0,"band":2}},
+     "options":[
+       {"text":"A change in diet toward more leafy green vegetables"},
+       {"text":"The antibiotic course, even though it has finished","correct":true},
+       {"text":"Meter error at this INR; repeat on a venous sample"},
+       {"text":"Loss of warfarin effect; the dose needs increasing"}
+     ],
+     "rationale":"Trimethoprim-sulfamethoxazole, metronidazole, fluconazole, ciprofloxacin and amiodarone all raise the INR. Antibiotics do it by two mechanisms: inhibiting metabolism and killing the gut flora that make vitamin K, which is why almost any antibiotic course warrants a recheck. Band 2: hold, consult, recheck within 24–48 hours."},
+
+    {"id":"warf-adv-03","lab":"Warfarin — dietary and drug influences on the INR","level":"advanced","type":"mcq","provenance":"field","domain":"2i",
+     "stem":"A newly anticoagulated patient asks whether she has to give up spinach and broccoli now that she is on warfarin. Best counseling message?",
+     "options":[
+       {"text":"Avoid leafy greens entirely while on warfarin"},
+       {"text":"Eat extra greens to protect against bleeding"},
+       {"text":"Keep vitamin K intake consistent week to week","correct":true},
+       {"text":"Diet does not affect warfarin in a meaningful way"}
+     ],
+     "rationale":"The counseling message is consistency rather than avoidance. A stable diet can be dosed around; a fluctuating one cannot. This is a preventative care and education item as much as a lab item."},
+
+    {"id":"warf-adv-04","lab":"Warfarin — dietary and drug influences on the INR","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"An 80-year-old on warfarin slipped in the kitchen and struck her head on the counter. She is alert, has a small scalp bruise and a normal neurological exam. POC INR {value}. Disposition?",
+     "values":{"value":{"lab":"INR","set":"warfarin","min":2.2,"max":2.8,"band":0}},
+     "options":[
+       {"text":"Manage in place; therapeutic INR and a normal exam"},
+       {"text":"Clinic visit within 24–48 hours for a full reassessment"},
+       {"text":"Hold tonight's warfarin and revisit in the morning"},
+       {"text":"Emergent transport regardless of the INR or the exam","correct":true}
+     ],
+     "rationale":"Band 3 by definition: a head injury on anticoagulation goes in even with a therapeutic number and a normal exam. The therapeutic INR is the trap."},
+
+    {"id":"warf-adv-05","lab":"Warfarin — dietary and drug influences on the INR","level":"advanced","type":"mcq","provenance":"field","domain":"3jj",
+     "stem":"A 79-year-old on warfarin has an INR of {value}, up from 2.6, with no new prescriptions. On questioning he has been taking two extra-strength acetaminophen tablets four times a day for a month for his knees. No bleeding. Which finding explains the change?",
+     "values":{"value":{"lab":"INR","set":"warfarin","min":4.6,"max":5.5,"band":2}},
+     "options":[
+       {"text":"Joint inflammation from the arthritis raises the INR"},
+       {"text":"The month of sustained high-dose acetaminophen","correct":true},
+       {"text":"Reduced activity has slowed warfarin clearance"},
+       {"text":"A shift toward eating more leafy green vegetables"}
+     ],
+     "rationale":"Sustained high-dose acetaminophen raises the INR, and it is regularly missed because patients do not think of it as a medication. Band 2: hold, consult, recheck. More greens would lower the INR, not raise it."},
+
+    {"id":"dd-adv-01","lab":"D-dimer","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 48-year-old with two days of mild pleuritic chest discomfort, normal vitals, normal saturation, no leg symptoms and no risk factors (low pretest probability). Send-out D-dimer {value}. Disposition?",
+     "values":{"value":{"set":"default","min":150,"max":400,"band":1}},
+     "options":[
+       {"text":"Home with follow-up; PE is effectively excluded","correct":true},
+       {"text":"Same-day CT angiography to confirm the negative result"},
+       {"text":"Emergent transport for chest pain evaluation"},
+       {"text":"Repeat the D-dimer in 48 hours before deciding"}
+     ],
+     "rationale":"A negative D-dimer with low or moderate pretest probability is the result that lets a patient stay home, and it is the only genuinely useful D-dimer result. Paramedics are trained in rule-in thinking and have no framework for negative predictive value."},
+
+    {"id":"dd-adv-02","lab":"D-dimer","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 66-year-old two weeks after a hip replacement has a swollen, tender left calf, a saturation of 90% on air and a heart rate of 112 (high pretest probability). A D-dimer sent yesterday returned {value}. Disposition?",
+     "values":{"value":{"set":"default","min":200,"max":400,"band":3}},
+     "options":[
+       {"text":"PE excluded by the D-dimer; manage the calf at home"},
+       {"text":"Clinic within 24–48 hours for a repeat D-dimer and reexam"},
+       {"text":"Emergent transport; a negative result cannot exclude PE","correct":true},
+       {"text":"Same-day calf ultrasound, then decide about transport"}
+     ],
+     "rationale":"The single most instructive D-dimer item: the test should not have been relied on, because with high pretest probability a negative result changes nothing. Hypoxia, tachycardia and unilateral leg swelling are band 3 regardless of the number."},
+
+    {"id":"dd-adv-03","lab":"D-dimer","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 59-year-old with a week of calf ache after a long car journey, normal vitals and no hypoxia (moderate pretest probability). Send-out D-dimer {value}. Disposition?",
+     "values":{"value":{"set":"default","min":600,"max":1800,"band":2}},
+     "options":[
+       {"text":"Emergent transport for a positive D-dimer"},
+       {"text":"Start aspirin and reassess in one week"},
+       {"text":"Reassure; D-dimer rises with age and travel"},
+       {"text":"Urgent same-day referral for imaging of the leg","correct":true}
+     ],
+     "rationale":"A positive D-dimer with low or moderate pretest probability needs imaging, so an urgent same-day referral, but on its own it does not diagnose anything. A positive result becoming an automatic transport is exactly the reflex the item targets; so is dismissing it."},
+
+    {"id":"lac-adv-01","lab":"Lactate","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 79-year-old with two days of dysuria and a mild fever looks comfortable: heart rate 92, blood pressure 128/74, saturation 96%. i-STAT lactate {value}. Disposition?",
+     "values":{"value":{"set":"mmol/L","min":4.2,"max":5.5,"band":3}},
+     "options":[
+       {"text":"Emergent transport for probable early urosepsis","correct":true},
+       {"text":"Provider consult for oral antibiotics at home"},
+       {"text":"Oral fluids and recheck the lactate in two hours"},
+       {"text":"Clinic evaluation within the next 24–48 hours"}
+     ],
+     "rationale":"Sepsis-3: a lactate over 4 mmol/L stands as the threshold, and carries markedly increased mortality regardless of appearance. This is the value that most often contradicts the physical exam, and that is precisely its worth. A medic assessing on appearance alone would miss it."},
+
+    {"id":"lac-adv-02","lab":"Lactate","level":"advanced","type":"mcq","provenance":"field","domain":"3jj",
+     "stem":"A 74-year-old on metformin has had vomiting and poor intake for three days. i-STAT: lactate {value}, creatinine {cr}. Which medication change is indicated?",
+     "baseline":"Documented baseline creatinine {crb}.",
+     "values":{"value":{"set":"mmol/L","min":2.9,"max":3.7,"band":2},"cr":{"lab":"Creatinine","set":"default","min":1.60,"max":1.70,"step":0.05,"band":3,"baselineKey":"crb"},"crb":{"lab":"Creatinine","set":"default","fixed":0.90,"context":true}},
+     "options":[
+       {"text":"Halve the metformin until he is eating normally"},
+       {"text":"Hold the metformin while renal function is falling","correct":true},
+       {"text":"Replace the metformin with basal insulin today"},
+       {"text":"No change; treat the vomiting and reassess tomorrow"}
+     ],
+     "rationale":"The metformin-plus-declining-renal-function case. Lactate is band 2 (urgent evaluation) and the creatinine is more than 50% above baseline (band 3). Metformin is held during any acute illness that threatens perfusion, because the risk is lactic acidosis."},
+
+    {"id":"wbc-adv-01","lab":"White blood cell count","level":"advanced","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A 66-year-old with COPD is on day four of a prednisone course. A send-out CBC from yesterday shows a white cell count of {value}. No fever, no change in sputum.",
+     "baseline":"White cell count is 7–9 ×10⁹/L off steroids; it rose to 13–14 during his last prednisone course.",
+     "values":{"value":{"set":"default","min":12.5,"max":14.5,"band":1}},
+     "answer":"baseline",
+     "rationale":"A steroid-driven leukocytosis of 14 in a COPD patient on prednisone is expected and means nothing. Band 1: interpret with the clinical picture; a mild leukocytosis alone is weak evidence."},
+
+    {"id":"wbc-adv-02","lab":"White blood cell count","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 58-year-old ten days after a chemotherapy cycle has a temperature of 38.3 °C and feels 'a bit off' but looks well, with normal vitals. Yesterday's send-out CBC shows a white cell count of {value} with an absolute neutrophil count under 500/µL. Disposition?",
+     "values":{"value":{"set":"default","min":0.6,"max":0.9,"band":3}},
+     "options":[
+       {"text":"Acetaminophen, fluids, and a recheck tomorrow"},
+       {"text":"Provider consult for oral antibiotics at home"},
+       {"text":"Clinic evaluation within 24–48 hours"},
+       {"text":"Emergent transport for neutropenic fever","correct":true}
+     ],
+     "rationale":"Band 3: an absolute neutrophil count under 500 with any fever. Neutropenic fever has a narrow antibiotic window and the patient often looks entirely well. Medics have essentially no exposure to this, and the instinct to reassure and leave is exactly wrong."},
+
+    {"id":"plt-adv-01","lab":"Platelet count","level":"advanced","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A 63-year-old with cirrhosis. Discharge CBC: platelet count {value}. No bleeding or bruising.",
+     "baseline":"Platelets have run 80–95 ×10⁹/L for years on his hepatology records.",
+     "values":{"value":{"set":"default","min":80,"max":95,"band":2}},
+     "answer":"baseline",
+     "rationale":"The cirrhotic patient at 90 has been there for years. Pair a low platelet count with an INR before drawing any conclusion about bleeding risk, because in liver disease the two move together."},
+
+    {"id":"lft-adv-01","lab":"Liver enzymes, alkaline phosphatase and bilirubin","level":"advanced","type":"mcq","provenance":"record","domain":"3jj",
+     "stem":"A 59-year-old with cirrhosis was discharged with an INR of {inr} off any anticoagulant, and a medication list that includes acetaminophen 1 g four times daily. Which is the correct reading of the INR?",
+     "values":{"inr":{"lab":"INR","set":"off","min":1.6,"max":2.0,"band":"liver"}},
+     "options":[
+       {"text":"He is effectively anticoagulated and cannot clot"},
+       {"text":"The INR needs reversal with oral vitamin K today"},
+       {"text":"Reduced factor synthesis rather than anticoagulation","correct":true},
+       {"text":"A laboratory error, since he takes no warfarin"}
+     ],
+     "rationale":"An INR of 1.8 in a cirrhotic patient is not anticoagulation. The liver is failing to make both procoagulant and anticoagulant factors, so the INR overstates bleeding risk and these patients can still thrombose. Reversal is not indicated. The reconciliation catch is the acetaminophen: the ceiling in established liver disease is commonly 2 g per day, and this list carries the standard 4 g maximum."},
+
+    {"id":"nh3-adv-01","lab":"Ammonia","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 62-year-old with cirrhosis has not taken lactulose for three days and has not had a bowel movement in four. He is oriented, walking and slightly slower than usual. Ammonia on a sample drawn this morning: {value}. Best action?",
+     "values":{"value":{"set":"default","min":85,"max":120,"band":2}},
+     "options":[
+       {"text":"Restart lactulose, titrate to soft stools, consult","correct":true},
+       {"text":"Emergent transport for acute hepatic encephalopathy"},
+       {"text":"Restrict dietary protein and recheck in a week"},
+       {"text":"No action while he remains oriented and walking"}
+     ],
+     "rationale":"Grade 1–2 encephalopathy from missed lactulose is frequently correctable at home, and the first question is almost always about bowel movements. The number correlates poorly with the grade of encephalopathy. Protein restriction is obsolete and considered harmful."},
+
+    {"id":"nh3-adv-02","lab":"Ammonia","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 62-year-old with cirrhosis has become somnolent and cannot swallow his lactulose. Ammonia drawn yesterday: {value}. Disposition?",
+     "values":{"value":{"set":"default","min":61,"max":77,"band":1}},
+     "options":[
+       {"text":"Manage at home; the ammonia is only mildly raised"},
+       {"text":"Clinic evaluation within 24–48 hours for lactulose"},
+       {"text":"Double the lactulose dose and revisit tomorrow"},
+       {"text":"Emergent transport; the mental status governs","correct":true}
+     ],
+     "rationale":"Band 3 is defined clinically: marked confusion, somnolence, or an inability to take oral lactulose. A cirrhotic at 90 who is oriented does not need an ambulance; one at 55 who has become somnolent does."},
+
+    {"id":"a1c-adv-01","lab":"HbA1c","level":"advanced","type":"mcq","provenance":"record","domain":"3jj",
+     "stem":"An 88-year-old who lives alone takes glipizide. Her record shows an HbA1c of {value} and two fingerstick readings under 70 mg/dL in the past month. Best reading of this result?",
+     "values":{"value":{"set":"default","min":5.9,"max":6.2,"band":"pre"}},
+     "options":[
+       {"text":"Excellent control; continue the current regimen as is"},
+       {"text":"Over-treatment; consult about relaxing the target","correct":true},
+       {"text":"Prediabetes range; stop the glipizide today"},
+       {"text":"Hypoglycemia risk; same-day evaluation in clinic"}
+     ],
+     "rationale":"An HbA1c of 6.2 in an eighty-eight-year-old on a sulfonylurea is not good control; it is a hypoglycemia risk in a patient for whom a deliberately looser target is appropriate. Paramedics read a low number as success. Stopping a drug unilaterally is not the CP's call, and nothing here is a same-day emergency."},
+
+    {"id":"a1c-adv-02","lab":"HbA1c","level":"advanced","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"Which patient's HbA1c is least reliable as a measure of glycemic control?",
+     "options":[
+       {"text":"CKD stage 4 with anemia, transfused last month","correct":true},
+       {"text":"Ate a full breakfast one hour before the draw"},
+       {"text":"Had a hypoglycemic episode yesterday evening"},
+       {"text":"Twenty years of type 2 diabetes managed on insulin"}
+     ],
+     "rationale":"HbA1c reliability fails in anemia, chronic kidney disease, recent transfusion and hemoglobinopathies. It is not a fasting test, and as a rolling three-month average it can never answer a question about today."},
+
+    {"id":"tsh-adv-01","lab":"TSH","level":"advanced","type":"mcq","provenance":"record","domain":"3jj",
+     "stem":"A 70-year-old on a stable levothyroxine dose has a TSH of {value}, up from {prior} six months ago. Since then she has started calcium carbonate and ferrous sulfate and takes everything together at breakfast. Most likely explanation?",
+     "values":{"value":{"set":"default","min":12.0,"max":30.0,"step":0.5,"band":2},"prior":{"set":"default","fixed":2.1,"context":true}},
+     "options":[
+       {"text":"The levothyroxine tablets have lost their potency"},
+       {"text":"Her thyroid has recovered and needs less replacement"},
+       {"text":"Calcium and iron are blocking the levothyroxine uptake","correct":true},
+       {"text":"The new supplements are raising her TSH directly"}
+     ],
+     "rationale":"Levothyroxine taken alongside calcium, iron or a proton pump inhibitor is not absorbed properly. This is a reconciliation and teach-back catch: separate the doses by several hours. Band 2: provider consult on the dose."},
+
+    {"id":"tsh-adv-02","lab":"TSH","level":"advanced","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"A provider increased a patient's levothyroxine dose ten days ago. The patient asks you to recheck her TSH today. Best response?",
+     "options":[
+       {"text":"Check it today; TSH responds within 48 hours"},
+       {"text":"Check it today; a low value would show overdosing"},
+       {"text":"Wait about two weeks; TSH lags the dose by ten days"},
+       {"text":"Wait about six weeks; a check now is uninformative","correct":true}
+     ],
+     "rationale":"Nothing about a TSH is ever a today decision, and a recheck sooner than six weeks is simply uninformative."},
+
+    {"id":"uds-adv-01","lab":"Urine dipstick","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"An 84-year-old woman is visited after a fall. She has no dysuria, frequency, urgency or suprapubic pain, and no fever. A dipstick done 'while you are here' is positive for nitrites and leukocyte esterase. Best action regarding the urine?",
+     "options":[
+       {"text":"Provider consult for a short antibiotic course"},
+       {"text":"No antibiotic; look elsewhere for the fall's cause","correct":true},
+       {"text":"Send a culture and start treatment while it is pending"},
+       {"text":"Same-day evaluation for urinary tract infection"}
+     ],
+     "rationale":"Arguably the single highest-yield gap item in the bank, because nearly everyone gets it wrong. A positive dipstick in an older adult with no urinary symptoms is asymptomatic bacteriuria and does not warrant antibiotics in a non-pregnant patient. Treating it drives resistance, C. difficile and avoidable transport."},
+
+    {"id":"uds-adv-02","lab":"Urine dipstick","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 90-year-old with dementia is 'more confused than usual' according to her daughter. No fever, no urinary symptoms, vitals normal. Dipstick positive for leukocyte esterase. Best next step?",
+     "options":[
+       {"text":"Treat the urinary infection as the cause of the confusion"},
+       {"text":"Emergent transport for possible early urosepsis"},
+       {"text":"Look for other causes: medications, hydration, bowels","correct":true},
+       {"text":"Reassure; a positive dipstick in women is usually benign"}
+     ],
+     "rationale":"Confusion alone does not make bacteriuria symptomatic, and reflexively attributing new confusion to a urinary infection is how the actual cause gets missed. Keep looking, and consult the provider about the confusion itself."},
+
+    {"id":"uds-adv-03","lab":"Urine dipstick","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 72-year-old woman has two days of dysuria and frequency, no fever, no flank pain, vitals normal. Dipstick positive for nitrites. Disposition?",
+     "options":[
+       {"text":"Provider consult for oral treatment at home","correct":true},
+       {"text":"Emergent transport for pyelonephritis"},
+       {"text":"No treatment; asymptomatic bacteriuria"},
+       {"text":"Clinic in 24–48 hours; no treatment meanwhile"}
+     ],
+     "rationale":"Positive with lower urinary symptoms and no systemic features is band 2: cystitis, treated at home, with a culture sent if one can be sent. Fever, flank pain, rigors or hemodynamic change would make it band 3."},
+
+    {"id":"ket-adv-01","lab":"Ketones — urine","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 34-year-old with type 1 diabetes has a cold and reduced her insulin because she is eating less. Fingerstick glucose {glu}, urine ketones moderate. She is alert, not vomiting, breathing normally. Disposition?",
+     "values":{"glu":{"lab":"Glucose","set":"mg/dL","min":260,"max":380,"band":2}},
+     "options":[
+       {"text":"Sick-day advice and a recheck visit tomorrow"},
+       {"text":"Emergent transport for evolving ketoacidosis"},
+       {"text":"Same-day provider consult; a bicarbonate is needed","correct":true},
+       {"text":"Hold insulin until she is eating normally again"}
+     ],
+     "rationale":"Moderate ketones, or any ketonuria with a glucose above 250, is band 2. Large ketones, vomiting, Kussmaul respirations, altered mentation or a low bicarbonate make it band 3. Reducing insulin during illness is the error that produced this picture; requirements rise with illness."},
+
+    {"id":"rapid-adv-01","lab":"Rapid antigen testing — influenza and group A strep","level":"advanced","type":"mcq","provenance":"field","domain":"3ii",
+     "stem":"A 72-year-old with COPD developed fever and myalgia 30 hours ago. Rapid influenza test positive. Saturation at her usual level, drinking well. Disposition?",
+     "options":[
+       {"text":"Emergent transport for influenza with underlying COPD"},
+       {"text":"Reassure; antivirals offer little benefit in adults"},
+       {"text":"Clinic visit in 24–48 hours, then decide on antivirals"},
+       {"text":"Provider consult today about antivirals; isolate at home","correct":true}
+     ],
+     "rationale":"The useful decision point is rarely the result itself; it is whether the patient is inside the antiviral window (roughly 48 hours) and whether comorbidity puts her in a treatment group. The comorbidity drives the decision. The secondary point is household isolation and PPE."},
+
+    {"id":"rapid-adv-02","lab":"Rapid antigen testing — influenza and group A strep","level":"advanced","type":"mcq","provenance":"field","domain":"3ff",
+     "stem":"In the middle of a heavy influenza season, a 65-year-old with classic abrupt fever, cough and myalgia has a negative rapid influenza test on day four of illness. Best interpretation?",
+     "options":[
+       {"text":"Influenza is excluded; look for a bacterial cause"},
+       {"text":"Not excluded; manage as influenza-like illness","correct":true},
+       {"text":"Repeat the test daily until it turns positive"},
+       {"text":"The negative test means she is not contagious"}
+     ],
+     "rationale":"Sensitivity falls late in the illness course and with poor swab technique. Swab technique and timing govern sensitivity more than the platform does."},
+
+    {"id":"ucx-adv-01","lab":"Urine culture","level":"advanced","type":"mcq","provenance":"record","domain":"3kk",
+     "stem":"A 76-year-old was discharged three days ago on cephalexin for a urinary infection. The urine culture finalized yesterday: significant growth of an organism reported resistant to cephalexin and sensitive to nitrofurantoin. She still has dysuria. Best action?",
+     "options":[
+       {"text":"Continue cephalexin; the course is nearly finished"},
+       {"text":"Provider consult today to change the antibiotic","correct":true},
+       {"text":"Emergent transport for a resistant infection"},
+       {"text":"No action; the hospital owns the culture result"}
+     ],
+     "rationale":"The high-value item: the sensitivity report against the discharge prescription. A patient sent home on an antibiotic the organism is resistant to is a common care-coordination failure, and the result frequently finalizes after discharge, meaning nobody has looked at it."},
+
+    {"id":"ucx-adv-02","lab":"Urine culture","level":"advanced","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"A 68-year-old with a long-term indwelling catheter has a culture from the catheter bag showing significant growth. No fever, no pain, no change in function. Best interpretation?",
+     "options":[
+       {"text":"Catheter-associated infection; consult for antibiotics"},
+       {"text":"Change the catheter and start empiric antibiotics"},
+       {"text":"Colonization; a bag specimen is not a valid culture","correct":true},
+       {"text":"Urosepsis until proven otherwise; emergent transport"}
+     ],
+     "rationale":"Long-term catheters are colonized by definition, so a positive culture in this group tells you almost nothing without symptoms, and a bag specimen from an indwelling catheter is not a valid culture."},
+
+    {"id":"pend-adv-01","lab":"Pending cultures and outstanding results at discharge","level":"advanced","type":"mcq","provenance":"record","domain":"3kk",
+     "stem":"Reviewing a discharge summary two days after discharge you find that blood cultures drawn on admission are listed as 'pending' and no clinician is named as responsible for following them up. The patient is well. Best action?",
+     "options":[
+       {"text":"Start empiric antibiotics in case the culture is positive"},
+       {"text":"No action; pending results belong to the hospital"},
+       {"text":"Transport for a repeat set of blood cultures today"},
+       {"text":"Contact the discharging service to establish an owner","correct":true}
+     ],
+     "rationale":"Not a lab value at all, and included deliberately. A result outstanding with no documented owner is band 2, and the correct answer is a coordination action far more often than any clinical action. A student who reaches for a disposition here has missed the point."},
+
+    {"id":"pend-adv-02","lab":"Pending cultures and outstanding results at discharge","level":"advanced","type":"mcq","provenance":"record","domain":"3kk",
+     "stem":"On day four after discharge you notice that the patient's admission blood culture finalized yesterday as positive for a gram-negative organism, with no documentation that anyone has seen it. The patient feels well. Best action?",
+     "options":[
+       {"text":"Urgent provider contact later the same day","correct":true},
+       {"text":"Note it for the next scheduled visit next week"},
+       {"text":"Reassure; feeling well suggests a contaminant"},
+       {"text":"Emergent transport for probable bacteremia"}
+     ],
+     "rationale":"A finalized positive blood culture nobody has acted on is band 3 for this row, and the action is still a coordination one: get a clinician on it today. Feeling well does not make a positive blood culture a contaminant."},
+
+    {"id":"ca-adv-01","lab":"Calcium — ionized","level":"advanced","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"Discharge chemistry on a 74-year-old with a chronic leg ulcer: total calcium {value}, albumin {alb}. How should the calcium be read?",
+     "values":{"value":{"set":"total","min":7.6,"max":7.9,"band":2},"alb":{"lab":"Albumin","set":"default","min":2.5,"max":2.8,"band":2}},
+     "options":[
+       {"text":"Hypocalcemia; provider consult for replacement"},
+       {"text":"Corrected for albumin, it falls within the normal range","correct":true},
+       {"text":"Hypocalcemia; emergent transport for tetany risk"},
+       {"text":"Uninterpretable without an ionized calcium value"}
+     ],
+     "rationale":"Add 0.8 mg/dL for every 1 g/dL the albumin sits below 4.0 and the calcium lands inside 8.5–10.5. Total calcium requires albumin correction; ionized calcium does not, which is why the POC ionized value is the more useful one. The low albumin is the real care-plan finding here."},
+
+    {"id":"alb-adv-01","lab":"Albumin","level":"advanced","type":"mcq","provenance":"record","domain":"3ll",
+     "stem":"A 79-year-old's sacral pressure injury has not improved in six weeks. Discharge albumin {value}. Best use of this result?",
+     "values":{"value":{"set":"default","min":2.5,"max":2.9,"band":2}},
+     "options":[
+       {"text":"Same-day evaluation for severe hypoalbuminemia"},
+       {"text":"Emergent transport for protein-calorie malnutrition"},
+       {"text":"Care plan: dietitian input and healing expectations","correct":true},
+       {"text":"No use; albumin has no bearing on wound healing"}
+     ],
+     "rationale":"Albumin is one of the better predictors of whether a wound will heal, which connects the lab table directly to the wound-care items in the blueprint. Its value to a CP is that it is never urgent: provider and dietitian involvement, realistic expectations, no transport."},
+
+    {"id":"hem-adv-01","lab":"Hematinics — ferritin, B12, vitamin D","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 74-year-old on metformin and omeprazole for ten years has new numbness in both feet and his family say he is 'slowing down'. Send-out B12 {value}. Best action?",
+     "values":{"value":{"set":"B12","min":90,"max":150,"band":2}},
+     "options":[
+       {"text":"Provider consult; this B12 deficiency is treatable","correct":true},
+       {"text":"Attribute the symptoms to age and his diabetes"},
+       {"text":"Same-day evaluation for new peripheral neuropathy"},
+       {"text":"Stop the metformin and recheck the level in a month"}
+     ],
+     "rationale":"B12 deficiency is common in long-term metformin and proton pump inhibitor users, which describes a large share of a CP caseload. It presents as neuropathy, gait change or cognitive slowing and gets attributed to age. Band 2. None of the hematinics ever produce a transport answer."},
+
+    {"id":"ck-adv-01","lab":"Creatine kinase","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"An 81-year-old was found on the floor after roughly ten hours, helped up by a neighbor, and now sits comfortably in her chair with normal vitals. A send-out CK drawn this morning returns {value}. Disposition?",
+     "values":{"value":{"set":"default","min":6000,"max":20000,"step":100,"band":3}},
+     "options":[
+       {"text":"Oral fluids at home and recheck the CK in a week"},
+       {"text":"Clinic evaluation with a repeat CK in 24–48 hours"},
+       {"text":"No action; she is comfortable with normal vitals"},
+       {"text":"Emergent transport for probable early rhabdomyolysis","correct":true}
+     ],
+     "rationale":"The long lie. Rhabdomyolysis threatens the kidneys, and clinical appearance can be unremarkable once the patient is back in a chair. This is one of the few places where the number should override a reassuring exam."},
+
+    {"id":"ck-adv-02","lab":"Creatine kinase","level":"advanced","type":"mcq","provenance":"record","domain":"3jj",
+     "stem":"A 63-year-old started atorvastatin two months ago and now reports aching thighs. Send-out CK {value}. Best action?",
+     "values":{"value":{"set":"default","min":320,"max":470,"band":1}},
+     "options":[
+       {"text":"Reassure; this CK is common and benign"},
+       {"text":"Advise him to stop the statin and reassess"},
+       {"text":"Provider consult about the statin dose","correct":true},
+       {"text":"Emergent transport for rhabdomyolysis"}
+     ],
+     "rationale":"A patient reporting aching thighs on a statin needs a CK rather than reassurance, and the correct action is a provider consult rather than telling them to stop the drug themselves. Band 1 also asks about exercise, a fall or an injection first."},
+
+    {"id":"phos-adv-01","lab":"Phosphate","level":"advanced","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 58-year-old with alcohol use disorder was discharged two days ago after a week of eating almost nothing, and is now eating full meals with supplement drinks. A send-out phosphate from this morning: {value}. He reports feeling weak. Best action?",
+     "values":{"value":{"set":"default","min":1.2,"max":1.8,"band":2}},
+     "options":[
+       {"text":"Provider consult today for refeeding syndrome","correct":true},
+       {"text":"Encourage more food; the weakness is expected"},
+       {"text":"Recheck the phosphate at next week's scheduled visit"},
+       {"text":"No action; phosphate is a care-plan number"}
+     ],
+     "rationale":"A malnourished patient restarted on nutrition can drop their phosphate sharply in the first 24–72 hours. The CP doing a day-two follow-up is positioned to catch it and nobody has told them to look. Band 2."},
+
+    {"id":"phos-adv-02","lab":"Phosphate","level":"advanced","type":"mcq","provenance":"record","domain":"2i",
+     "stem":"A 70-year-old on dialysis has a phosphate of {value}. He takes his phosphate binder 'every morning with my other pills' on an empty stomach and swears he never misses it. Best teaching point?",
+     "values":{"value":{"set":"default","min":5.8,"max":6.8,"band":2}},
+     "options":[
+       {"text":"He must be missing doses; reinforce adherence"},
+       {"text":"The binder dose needs to be doubled at once"},
+       {"text":"Binders only work when taken with food","correct":true},
+       {"text":"Binders stop working once dialysis starts"}
+     ],
+     "rationale":"On the high side, the practical teaching point is that phosphate binders only work when taken with food, and adherence failures here are almost always timing failures rather than refusals. Band 2: provider consult."},
+
+    {"id":"pt-adv-01","lab":"Prothrombin time","level":"advanced","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"A 75-year-old on warfarin has a hospital coagulation panel showing prothrombin time {value} and INR {inr}. Which number governs the warfarin decision?",
+     "values":{"value":{"set":"default","min":15,"max":17,"band":1},"inr":{"lab":"INR","set":"warfarin","min":2.2,"max":2.8,"band":0}},
+     "options":[
+       {"text":"The prothrombin time, as the direct measurement"},
+       {"text":"The INR, which standardizes across reagents","correct":true},
+       {"text":"Both together; they are read as a pair"},
+       {"text":"Neither; warfarin is monitored by the aPTT"}
+     ],
+     "rationale":"The reason the INR was created is that a raw prothrombin time is not comparable between laboratories using different reagents, so the same blood yields different seconds in different labs. Every warfarin decision runs off the INR; here it is therapeutic."},
+
+    {"id":"rbc-adv-01","lab":"Red blood cell count","level":"advanced","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"A 70-year-old woman's discharge CBC shows red cell count {value} and hemoglobin {hgb}. Which number carries the clinical weight?",
+     "baseline":"Hemoglobin has been 10.5–11.0 g/dL for a year on her records.",
+     "values":{"value":{"set":"default","min":3.3,"max":3.7,"band":1},"hgb":{"lab":"Hemoglobin","set":"female","min":10.4,"max":11.2,"band":1}},
+     "options":[
+       {"text":"The red cell count; it is low and needs transfusion"},
+       {"text":"The red cell count; it is the more specific measure"},
+       {"text":"The hemoglobin; it is stable at her own baseline","correct":true},
+       {"text":"Both; each is a critical value in its own right"}
+     ],
+     "rationale":"Included because the textbook lists it, not because it decides anything. The red cell count adds only indices. If a student reaches a disposition from a red cell count rather than from the hemoglobin, the distractor has worked."},
+
+    {"id":"amy-adv-01","lab":"Amylase and lipase","level":"advanced","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"Serial results on a 55-year-old show a lipase that has risen on each of three draws, and he now describes epigastric pain radiating to his back. Which statement is correct?",
+     "options":[
+       {"text":"Amylase is more specific; lipase can be ignored"},
+       {"text":"Lipase is more specific and stays raised for longer","correct":true},
+       {"text":"A single lipase can be classified against the textbook"},
+       {"text":"Pancreatic enzymes are mainly relevant in alcohol use"}
+     ],
+     "rationale":"Deliberately thin in the table: this is unlikely to be tested on a specific number and far more likely to appear as a direction of travel. A rising trend with this pain needs urgent evaluation. The course does not supply a range, so no normal-versus-abnormal item exists on these analytes."},
+
+    {"id":"osm-adv-01","lab":"Serum osmolality","level":"advanced","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"A 78-year-old nursing-home resident with type 2 diabetes has a fingerstick glucose of {glu}, dry mucous membranes and drowsiness. Which best explains why she is profoundly dehydrated?",
+     "values":{"glu":{"lab":"Glucose","set":"mg/dL","min":520,"max":800,"step":10,"band":3}},
+     "options":[
+       {"text":"High glucose dilutes the blood and shifts water into cells"},
+       {"text":"Hyperglycemia raises osmolality, driving osmotic diuresis","correct":true},
+       {"text":"Ketones rather than glucose account for the fluid loss"},
+       {"text":"Drowsiness has reduced her oral fluid intake for days"}
+     ],
+     "rationale":"The course textbook treats osmolality conceptually and so does the bank: it is driven mainly by sodium, glucose and urea. The hyperosmolar diabetic patient is the classic case, and the glucose here is band 3: emergent transport for HHS."},
+
+    {"id":"na-f-01","lab":"Sodium","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 70-year-old on an SSRI started six weeks ago feels 'fine'. i-STAT sodium {value}.",
+     "baseline":"Sodium was 140 mEq/L before the SSRI was started.",
+     "values":{"value":{"set":"default","min":131,"max":132,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below the 136 mEq/L lower limit, and a fall of about 8 from a documented baseline on a drug that causes SIADH. Band 1: document and trend, but it is not this patient's baseline. Near-normal numbers are where a medic reads 'normal' from a glance."},
+
+    {"id":"na-f-02","lab":"Sodium","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"An 88-year-old with reduced thirst has an i-STAT sodium of {value}.",
+     "baseline":"Sodium was 139 mEq/L at the last visit.",
+     "values":{"value":{"set":"default","min":147,"max":149,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Above the 142 mEq/L upper limit of the course textbook range. Many laboratory reports run to 145, which is why the bank never uses 143–146: this value is abnormal on any report."},
+
+    {"id":"k-f-01","lab":"Potassium","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 73-year-old on furosemide. i-STAT potassium {value}, clean draw. She feels well.",
+     "baseline":"Potassium was 4.1 mEq/L three months ago.",
+     "values":{"value":{"set":"default","min":3.0,"max":3.2,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below 3.5 mEq/L. Band 1: provider consult on timing for a diuretic and supplement adjustment. The value is not dramatic, which is the point; the trend from 4.1 on a loop diuretic is what matters."},
+
+    {"id":"k-f-02","lab":"Potassium","level":"fiendish","type":"mcq","provenance":"field","domain":"3f",
+     "stem":"A 68-year-old with no renal disease feels well. A difficult draw through a 25-gauge needle with a long tourniquet time gives an i-STAT potassium of {value}. ECG normal. Best action?",
+     "values":{"value":{"set":"default","min":6.0,"max":6.4,"band":2}},
+     "options":[
+       {"text":"Emergent transport with cardiac monitoring"},
+       {"text":"Give calcium gluconate and transport"},
+       {"text":"Redraw with good technique before acting","correct":true},
+       {"text":"Disregard the value; the ECG is normal"}
+     ],
+     "rationale":"The highest-yield specimen-integrity item in the bank. Hemolysis from a small-gauge needle, excessive tourniquet time, fist clenching or a rough transport falsely elevates potassium, sometimes by more than 1 mEq/L. A surprise hyperkalemia in a well-looking patient is redrawn before anyone acts on it; disregarding it is also wrong."},
+
+    {"id":"hco3-f-01","lab":"Bicarbonate / total CO2","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 66-year-old with three days of diarrhea. i-STAT bicarbonate {value}.",
+     "baseline":"Bicarbonate was 25 mEq/L on his last panel.",
+     "values":{"value":{"set":"default","min":18,"max":19,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below the 21 mEq/L lower limit. Band 1: document and trend against baseline. A falling bicarbonate is the earliest numeric sign of an evolving metabolic acidosis."},
+
+    {"id":"ph-f-01","lab":"pH","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 59-year-old with no lung disease and a new productive cough. i-STAT venous gas pH {value}.",
+     "baseline":"No prior gas; no history of CO2 retention.",
+     "values":{"value":{"set":"default","min":7.32,"max":7.33,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below 7.35. Band 1: interpret with pCO2 and bicarbonate. In a known retainer this might be baseline, but this patient has no such history."},
+
+    {"id":"pco2-f-01","lab":"pCO2","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 62-year-old with obesity and daytime sleepiness. i-STAT venous gas pCO2 {value}.",
+     "baseline":"No prior gas on record.",
+     "values":{"value":{"set":"default","min":48,"max":50,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Above the 45 mmHg upper limit. Band 1: trend against baseline; common and often chronic. Obesity hypoventilation is on the list of causes. Without a prior gas it cannot be called baseline."},
+
+    {"id":"hgb-f-01","lab":"Hemoglobin","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 66-year-old woman on daily aspirin and ibuprofen. HemoCue hemoglobin {value}. She feels well.",
+     "baseline":"Hemoglobin was 12.4 g/dL four months ago.",
+     "values":{"value":{"set":"female","min":10.6,"max":11.4,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below the female range of 12–16 g/dL, and drifting down from a documented value on two drugs that cause GI blood loss. Band 1: document and trend, but it is not her baseline. Feeling well is not a laboratory finding."},
+
+    {"id":"hgb-f-02","lab":"Hemoglobin","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A 72-year-old woman with myelodysplasia who receives a transfusion every few months. HemoCue hemoglobin {value}. No bleeding, no dyspnea beyond her usual.",
+     "baseline":"Hemoglobin runs 7.4–7.9 g/dL between transfusions on her hematology records.",
+     "values":{"value":{"set":"female","min":7.4,"max":7.9,"band":2}},
+     "answer":"baseline",
+     "rationale":"A number that looks like a transfusion trigger, but it is her documented between-transfusion level with no hemodynamic compromise or bleeding. Band 2: provider consult, which in her case means her hematology team's usual plan. Not an ED."},
+
+    {"id":"wbc-f-01","lab":"White blood cell count","level":"fiendish","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A 40-year-old of West African descent has a routine send-out CBC showing a white cell count of {value}. He is well.",
+     "baseline":"White cell count has been 3.6–4.0 ×10⁹/L on every CBC for a decade, with a normal differential.",
+     "values":{"value":{"set":"default","min":3.6,"max":4.1,"band":1}},
+     "answer":"baseline",
+     "rationale":"Below 4.5 ×10⁹/L, but benign ethnic neutropenia gives a lower baseline in some patients, and a decade of records confirms it. Band 1 numerically; his normal clinically."},
+
+    {"id":"wbc-f-02","lab":"White blood cell count","level":"fiendish","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A discharge CBC on a 70-year-old reports a white cell count of {value}.",
+     "baseline":"Prior white cell counts 6,000–8,000/µL.",
+     "values":{"value":{"set":"cells/µL","min":12000,"max":14500,"step":100,"band":1}},
+     "answer":"abnormal",
+     "rationale":"The course textbook writes the range as 4,500–11,000/µL, the same as 4.5–11.0 ×10⁹/L. This value is above it: band 1, a mild leukocytosis, interpreted with the clinical picture. The size of the number is the trap; read the units."},
+
+    {"id":"plt-f-01","lab":"Platelet count","level":"fiendish","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A 70-year-old started on subcutaneous heparin after a hip repair has a send-out platelet count of {value}. No bleeding.",
+     "baseline":"Platelet count was 240 ×10⁹/L before surgery.",
+     "values":{"value":{"set":"default","min":100,"max":135,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below 150 ×10⁹/L and roughly halved from a documented baseline on new heparin exposure. Band 1 numerically, but the fall matters more than the number: heparin-induced thrombocytopenia is on the list of causes and this needs a provider today."},
+
+    {"id":"plt-f-02","lab":"Platelet count","level":"fiendish","type":"mcq","provenance":"record","domain":"3f",
+     "stem":"A well 64-year-old with no bruising or bleeding has a send-out platelet count of {value}. Best first action?",
+     "baseline":"Platelet count was 230 ×10⁹/L two months ago.",
+     "values":{"value":{"set":"default","min":55,"max":70,"band":2}},
+     "options":[
+       {"text":"Ask for a citrate-tube redraw","correct":true},
+       {"text":"Emergent transport for bleeding risk"},
+       {"text":"Stop aspirin and reassess in a month"},
+       {"text":"No action; he has no bleeding"}
+     ],
+     "rationale":"EDTA-induced clumping produces a spuriously low count. A surprise low platelet count in a well patient needs a citrate-tube redraw before anything else. If it is confirmed it is band 2 and a provider consult; if it is clumping it is nothing."},
+
+    {"id":"glu-f-01","lab":"Glucose","level":"fiendish","type":"classify","provenance":"field","domain":"3p",
+     "stem":"A 77-year-old on glipizide has a fasting fingerstick glucose of {value}. She feels fine.",
+     "baseline":"Her log shows fasting readings of 90–110 mg/dL.",
+     "values":{"value":{"set":"mg/dL","min":60,"max":64,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below the 70 mg/dL lower limit of the fasting range on a sulfonylurea. Band 1: treat and recheck. Asymptomatic hypoglycemia in an older patient on a sulfonylurea is a dosing conversation, not a shrug."},
+
+    {"id":"glu-f-02","lab":"Glucose","level":"fiendish","type":"classify","provenance":"field","domain":"3p",
+     "stem":"A discharge summary from a hospital that reports in SI units gives a fasting glucose of {value}.",
+     "values":{"value":{"set":"mmol/L","min":4.4,"max":5.2,"band":0}},
+     "answer":"normal",
+     "rationale":"Multiply by 18: this is about 80–95 mg/dL, inside the 70–100 mg/dL fasting range. A small number in mmol/L is not hypoglycemia."},
+
+    {"id":"glu-f-03","lab":"Glucose","level":"fiendish","type":"mcq","provenance":"field","domain":"3f",
+     "stem":"A send-out chemistry was drawn at a patient's home in a plain tube and driven to the laboratory three hours later. The reported glucose is {value}. The patient was asymptomatic at the draw and had eaten breakfast. Best interpretation?",
+     "values":{"value":{"set":"mg/dL","min":58,"max":64,"band":1}},
+     "options":[
+       {"text":"True hypoglycemia; treat and recheck in 15 minutes"},
+       {"text":"Provider consult to reduce the diabetes medication dose"},
+       {"text":"Emergent transport for symptomatic hypoglycemia"},
+       {"text":"Falsely low from the delay; confirm by fingerstick","correct":true}
+     ],
+     "rationale":"Glucose falls roughly 5–7% per hour in a tube without a glycolytic inhibitor, so a send-out drawn at the house and driven in reads falsely low. A capillary reading now, or a properly collected sample, settles it."},
+
+    {"id":"lac-f-01","lab":"Lactate","level":"fiendish","type":"classify","provenance":"field","domain":"3ff",
+     "stem":"A hospital discharge summary reports a lactate of {value} on the day of discharge. The patient is well.",
+     "values":{"value":{"set":"mg/dL","min":8,"max":13,"band":0}},
+     "answer":"normal",
+     "rationale":"Units trap. In mg/dL the course textbook range is 5–15, so this is normal. The same number in mmol/L would be lethal. A lactate of 12 is normal in mg/dL and lethal in mmol/L: read the units before the number."},
+
+    {"id":"lac-f-02","lab":"Lactate","level":"fiendish","type":"mcq","provenance":"field","domain":"3ff",
+     "stem":"A discharge summary reports a lactate of {value}. Your protocol's sepsis threshold is written in mmol/L. Roughly what is this value in mmol/L?",
+     "values":{"value":{"set":"mg/dL","fixed":12,"band":0}},
+     "options":[
+       {"text":"About 1.3, which is within normal","correct":true},
+       {"text":"About 12, which is critically high"},
+       {"text":"About 108, far above the threshold"},
+       {"text":"About 0.13, which is below normal"}
+     ],
+     "rationale":"mg/dL divided by 9.01 gives mmol/L. The two unit systems differ about ninefold, and one item in the bank turns on the conversion itself."},
+
+    {"id":"lac-f-03","lab":"Lactate","level":"fiendish","type":"mcq","provenance":"field","domain":"3f",
+     "stem":"A well 55-year-old had a slow draw with a tourniquet on for three minutes while pumping his fist. i-STAT lactate {value}. No fever, no infection, normal vitals. Best action?",
+     "values":{"value":{"set":"mmol/L","min":2.0,"max":2.8,"band":1}},
+     "options":[
+       {"text":"Urgent evaluation for occult sepsis"},
+       {"text":"Recheck with a clean, quick draw","correct":true},
+       {"text":"Emergent transport for hyperlactatemia"},
+       {"text":"Start oral fluids and recheck tomorrow"}
+     ],
+     "rationale":"A prolonged tourniquet and a clenched fist falsely raise lactate. Band 1: recheck and consider a benign cause before escalating. Exercise, seizure and a prolonged tourniquet all raise lactate transiently."},
+
+    {"id":"alb-f-01","lab":"Albumin","level":"fiendish","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"Discharge chemistry on a 76-year-old: albumin {value}.",
+     "values":{"value":{"set":"default","min":3.0,"max":3.2,"band":1}},
+     "answer":"abnormal",
+     "rationale":"Below the 3.5 g/dL lower limit. Band 1: a nutritional care-plan item and never a disposition driver. Abnormal, and also entirely unhurried."},
+
+    {"id":"alb-f-02","lab":"Albumin","level":"fiendish","type":"mcq","provenance":"record","domain":"3ll",
+     "stem":"An 84-year-old with advanced dementia and weight loss has a discharge albumin of {value}. She is comfortable. Her daughter asks whether this means she should go back to hospital. Best response?",
+     "values":{"value":{"set":"default","min":1.5,"max":2.3,"band":3}},
+     "options":[
+       {"text":"Yes; an albumin this low is a critical laboratory value"},
+       {"text":"Yes; she needs intravenous albumin replacement in hospital"},
+       {"text":"No; it signals prognosis, not a need for admission","correct":true},
+       {"text":"No; the number has no clinical meaning at her age"}
+     ],
+     "rationale":"Band 3 for albumin is explicitly not an emergency. It signals a poor prognosis and should prompt a goals-of-care conversation and a nutrition plan rather than a transport. The number is alarming and changes nothing about today."},
+
+    {"id":"a1c-f-01","lab":"HbA1c","level":"fiendish","type":"classify","provenance":"record","domain":"3ff",
+     "stem":"A 52-year-old with no diabetes diagnosis has a clinic HbA1c of {value}.",
+     "values":{"value":{"set":"default","min":5.9,"max":6.2,"band":"pre"}},
+     "answer":"abnormal",
+     "rationale":"5.7–6.4% is prediabetes, so the value is abnormal, but it is a care-plan and education finding and never a transport."},
+
+    {"id":"a1c-f-02","lab":"HbA1c","level":"fiendish","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"A 61-year-old's clinic record shows an HbA1c of {value}. Today's fingerstick is {glu} and she feels well. Disposition?",
+     "values":{"value":{"set":"default","min":11.0,"max":13.5,"band":2},"glu":{"lab":"Glucose","set":"mg/dL","min":185,"max":240,"band":1}},
+     "options":[
+       {"text":"Emergent transport for a critically high HbA1c"},
+       {"text":"Provider consult on the regimen; manage in place","correct":true},
+       {"text":"Same-day evaluation for uncontrolled diabetes"},
+       {"text":"Correction-dose insulin now; recheck in two hours"}
+     ],
+     "rationale":"An HbA1c never generates an emergency; any item here with a transport answer is a badly written item. It is a rolling three-month average and cannot answer a question about today. Today's glucose is band 1: sustained hyperglycemia in this range is a medication-adherence conversation."},
+
+    {"id":"pt-f-01","lab":"Prothrombin time","level":"fiendish","type":"mcq","lengthException":true,"provenance":"record","domain":"3ff",
+     "stem":"A 74-year-old on warfarin has a hospital coagulation panel: prothrombin time {value}, aPTT {aptt}. Which result reflects the warfarin effect?",
+     "values":{"value":{"set":"default","min":15,"max":17,"band":1},"aptt":{"lab":"aPTT","set":"default","min":28,"max":37,"band":0}},
+     "options":[
+       {"text":"Prothrombin time","correct":true},
+       {"text":"Activated PTT"},
+       {"text":"Both equally"},
+       {"text":"Neither test"}
+     ],
+     "rationale":"Look-alike distractor. PT/INR monitors warfarin, which acts on the vitamin K-dependent extrinsic pathway; aPTT monitors unfractionated heparin. The aPTT here is normal, which is expected."},
+
+    {"id":"aptt-f-01","lab":"aPTT","level":"fiendish","type":"mcq","lengthException":true,"provenance":"record","domain":"3ff",
+     "stem":"A hospital coagulation panel on a 68-year-old shows aPTT {value} with a normal prothrombin time. Which medication on her list best explains it?",
+     "values":{"value":{"set":"default","min":48,"max":68,"band":2}},
+     "options":[
+       {"text":"Warfarin"},
+       {"text":"Aspirin"},
+       {"text":"Heparin","correct":true},
+       {"text":"Clopidogrel"}
+     ],
+     "rationale":"Unfractionated heparin prolongs the aPTT; warfarin prolongs the PT/INR; aspirin and clopidogrel affect platelet function and change neither test. A prolonged aPTT with a normal PT points at the intrinsic pathway."},
+
+    {"id":"bun-f-01","lab":"BUN","level":"fiendish","type":"mcq","provenance":"field","domain":"3ff",
+     "stem":"i-STAT on an 80-year-old with poor fluid intake: BUN {value}, creatinine {cr}. Which interpretation is correct?",
+     "baseline":"Documented baseline creatinine {crb}.",
+     "values":{"value":{"set":"default","min":28,"max":34,"band":1},"cr":{"lab":"Creatinine","set":"default","fixed":0.90,"band":0,"baselineKey":"crb"},"crb":{"lab":"Creatinine","set":"default","fixed":0.90,"context":true}},
+     "options":[
+       {"text":"Intrinsic renal failure; both values are abnormal"},
+       {"text":"Acute kidney injury; both values have risen from baseline"},
+       {"text":"A normal panel for a woman of her age and intake"},
+       {"text":"Prerenal; ratio over 20:1 with creatinine at baseline","correct":true}
+     ],
+     "rationale":"Look-alike trap: BUN and creatinine travel together on the panel but mean different things. BUN is band 1 (interpret with creatinine as a ratio, never alone); the creatinine is unchanged from baseline. The ratio points to dehydration."},
+
+    {"id":"trop-f-01","lab":"Troponin","level":"fiendish","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"A 79-year-old fell in the garden two days ago and has bruised thighs. Send-out results: CK {ck}, troponin {value}. No chest pain, ECG unchanged. Best interpretation?",
+     "baseline":"Prior troponin {baseline} last year.",
+     "values":{"value":{"set":"default","min":0.00,"max":0.02,"band":0},"ck":{"lab":"Creatine kinase","set":"default","min":800,"max":3000,"step":50,"band":2},"baseline":{"set":"default","fixed":0.01,"context":true}},
+     "options":[
+       {"text":"Myocardial infarction; the CK is elevated"},
+       {"text":"Skeletal muscle injury; the troponin is normal","correct":true},
+       {"text":"Rhabdomyolysis; emergent transport is needed"},
+       {"text":"Both values within expected limits after a fall"}
+     ],
+     "rationale":"Look-alike distractor: CK and troponin both appear on a 'cardiac' panel, but only troponin is cardiac-specific. CK is band 2 (provider consult; review hydration and follow it), not band 3, which needs a value over 5000 U/L, dark urine, reduced urine output or a prolonged down time."},
+
+    {"id":"trop-f-02","lab":"Troponin","level":"fiendish","type":"mcq","provenance":"record","domain":"3ii",
+     "stem":"You are visiting a 70-year-old two weeks after discharge for a treated myocardial infarction. The discharge summary lists a peak troponin of {value}. He is comfortable with no chest pain. What does the number mean for today's visit?",
+     "baseline":"The value is the in-hospital peak from the treated event; no troponin has been drawn since.",
+     "values":{"value":{"set":"default","min":8.0,"max":25.0,"step":0.5,"band":1}},
+     "options":[
+       {"text":"Emergent transport; the troponin is critically high"},
+       {"text":"Same-day evaluation to repeat the troponin level"},
+       {"text":"Hold cardiac medications until it normalizes"},
+       {"text":"Nothing today; it is a historical peak value","correct":true}
+     ],
+     "rationale":"The cleanest illustration of the provenance problem. A troponin on a discharge sheet is a historical peak from an event already treated, and the infarct is not re-decided in someone's living room. Use it to understand what happened, then work the discharge plan and the medication list. Medics see the word troponin and think acute."},
+
+    {"id":"bnp-f-01","lab":"BNP","level":"fiendish","type":"mcq","provenance":"field","domain":"3ff",
+     "stem":"A 75-year-old's hospital discharge summary reports an NT-proBNP of 900 pg/mL. Today your i-STAT BNP reads {value}. Has the heart failure improved?",
+     "baseline":"The only prior value is the hospital NT-proBNP of 900 pg/mL; no prior BNP exists.",
+     "values":{"value":{"set":"default","min":300,"max":380,"band":1}},
+     "options":[
+       {"text":"Yes; the number has fallen by more than half"},
+       {"text":"No; a BNP above 200 is worse than that NT-proBNP"},
+       {"text":"Cannot say; the two assays are not comparable","correct":true},
+       {"text":"Yes, provided the patient also feels better"}
+     ],
+     "rationale":"Look-alike trap. BNP and NT-proBNP are different analytes with different cutoffs and cannot be compared across assays. Today's value is band 1 on its own terms; the comparison the stem invites is invalid."},
+
+    {"id":"cr-f-01","lab":"Creatinine","level":"fiendish","type":"mcq","provenance":"field","domain":"3jj",
+     "stem":"A frail, cachectic 85-year-old woman weighing 42 kg has an i-STAT creatinine of {value}. She is on gabapentin and a sulfonylurea. Does this creatinine confirm normal renal function for dosing?",
+     "baseline":"Documented baseline creatinine {baseline}.",
+     "values":{"value":{"set":"default","min":0.85,"max":0.95,"step":0.05,"band":0},"baseline":{"set":"default","fixed":0.90,"context":true}},
+     "options":[
+       {"text":"No; her low muscle mass makes it falsely reassuring","correct":true},
+       {"text":"Yes; the value is within the 0.6–1.2 mg/dL range"},
+       {"text":"Yes; it matches her documented baseline exactly"},
+       {"text":"No; a creatinine under 1.0 is abnormal in the elderly"}
+     ],
+     "rationale":"Creatinine depends on muscle mass, so amputees, cachectic and very old patients read falsely reassuring. A Cockcroft-Gault estimate, which needs age, weight and sex, is the older and still widely expected method for dosing; a measured 24-hour urine creatinine clearance is the reference standard."},
+
+    {"id":"ca-f-01","lab":"Calcium — ionized","level":"fiendish","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"Discharge chemistry: total calcium {value}, albumin {alb}. After correction, how should the calcium be classified?",
+     "values":{"value":{"set":"total","min":8.0,"max":8.2,"band":1},"alb":{"lab":"Albumin","set":"default","min":3.0,"max":3.2,"band":1}},
+     "options":[
+       {"text":"Mildly low; document and trend at the next visit"},
+       {"text":"Low enough to warrant a provider consult today"},
+       {"text":"Normal; correction brings it inside 8.5–10.5","correct":true},
+       {"text":"Uninterpretable without an ionized calcium value"}
+     ],
+     "rationale":"A near-normal total calcium with a low albumin is an entirely normal corrected calcium: add 0.8 mg/dL for each 1 g/dL the albumin sits below 4.0. Correct for albumin before interpreting is the table's band 1 instruction."},
+
+    {"id":"nh3-f-01","lab":"Ammonia","level":"fiendish","type":"mcq","provenance":"record","domain":"3f",
+     "stem":"A discharge summary on a 60-year-old with cirrhosis lists an ammonia of {value}. On your visit he is oriented, alert and walking. The record notes the sample sat at room temperature for 90 minutes before processing. Best interpretation?",
+     "values":{"value":{"set":"default","min":160,"max":300,"step":5,"band":3}},
+     "options":[
+       {"text":"Emergent transport; the ammonia is above 150"},
+       {"text":"A poorly handled specimen; assess the patient","correct":true},
+       {"text":"Increase lactulose until the ammonia normalizes"},
+       {"text":"Restrict dietary protein and recheck in one week"}
+     ],
+     "rationale":"The most handling-sensitive analyte in the table. The sample must go on ice and be separated within about fifteen minutes, or amino acid deamination in the tube drives the result up; a prolonged tourniquet, fist clenching and recent smoking do the same. A strikingly high ammonia in a patient who looks well may simply be a bad specimen."},
+
+    {"id":"egfr-f-01","lab":"eGFR","level":"fiendish","type":"mcq","provenance":"record","domain":"3jj",
+     "stem":"A 79-year-old's record shows an eGFR of {value}, unchanged for three years. He is well. What does this number ask you to do?",
+     "values":{"value":{"set":"default","min":45,"max":56,"band":1}},
+     "options":[
+       {"text":"Screen the medication list against the number","correct":true},
+       {"text":"Arrange same-day evaluation for renal failure"},
+       {"text":"Refer to nephrology for dialysis planning"},
+       {"text":"Nothing; a stable value needs no action"}
+     ],
+     "rationale":"Stage 3a, stable: band 1, not a disposition question. The number looks alarming to a medic who has never seen one and changes nothing today except how drugs are dosed."},
+
+    {"id":"tsh-f-01","lab":"TSH","level":"fiendish","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"A 68-year-old's discharge summary from a pneumonia admission includes a TSH of {value} with a normal free T4. She takes no thyroid medication. Best action?",
+     "values":{"value":{"set":"default","min":4.4,"max":8.0,"step":0.1,"band":1}},
+     "options":[
+       {"text":"Provider consult to start levothyroxine"},
+       {"text":"Emergent transport for possible myxedema"},
+       {"text":"Repeat the TSH tomorrow with a free T4"},
+       {"text":"Flag for a recheck in about six weeks","correct":true}
+     ],
+     "rationale":"Recent acute illness distorts the result; avoid interpreting a TSH drawn during a hospitalization. Subclinical with a normal free T4 is band 1 in any case, and the upper limit drifts higher with age."},
+
+    {"id":"rbc-f-01","lab":"Red blood cell count","level":"fiendish","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"A 62-year-old man's discharge CBC: red cell count {value}, hemoglobin {hgb}. Disposition?",
+     "baseline":"Hemoglobin was 15.0 g/dL last year.",
+     "values":{"value":{"set":"default","min":3.3,"max":3.6,"band":1},"hgb":{"lab":"Hemoglobin","set":"male","min":14.6,"max":16.5,"band":0}},
+     "options":[
+       {"text":"No action; the hemoglobin is normal","correct":true},
+       {"text":"Provider consult for possible anemia"},
+       {"text":"Same-day evaluation for macrocytosis"},
+       {"text":"Emergent transport for possible bleeding"}
+     ],
+     "rationale":"The hemoglobin decides. A low red cell count with a normal hemoglobin is an indices question (larger cells), not a disposition; the red cell count is never a standalone critical value."},
+
+    {"id":"ket-f-01","lab":"Ketones — urine","level":"fiendish","type":"mcq","provenance":"field","domain":"3p",
+     "stem":"A 28-year-old with type 1 diabetes whose insulin pump failed overnight is vomiting with deep, rapid breathing. Fingerstick glucose {glu}. The urine dipstick reads negative for ketones. Best interpretation?",
+     "values":{"glu":{"lab":"Glucose","set":"mg/dL","min":410,"max":520,"step":5,"band":3}},
+     "options":[
+       {"text":"Ketoacidosis excluded; manage the glucose at home"},
+       {"text":"The pump failure is irrelevant with negative ketones"},
+       {"text":"Treat as DKA; strips miss beta-hydroxybutyrate","correct":true},
+       {"text":"Repeat the dipstick in four hours before deciding"}
+     ],
+     "rationale":"Fiendish-only content: dipsticks detect acetoacetate, not beta-hydroxybutyrate, which predominates early, so the strip can under-read when the patient is sickest. Blood ketone meters measure the ketone the strip misses. Kussmaul respirations, vomiting and a glucose over 400 are band 3 regardless of the strip. The patient, not the strip, decides."},
+
+    {"id":"ket-f-02","lab":"Ketones — urine","level":"fiendish","type":"mcq","provenance":"field","domain":"3p",
+     "stem":"A 40-year-old with type 1 diabetes was treated for mild ketoacidosis and sent home on a sick-day plan. On your follow-up visit she is eating, alert, breathing normally and her glucose is coming down, but her urine ketone strip reads larger than yesterday. Best interpretation?",
+     "options":[
+       {"text":"Relapse into ketoacidosis; emergent transport"},
+       {"text":"Not deterioration; the strip lags clinical recovery","correct":true},
+       {"text":"The strip is invalid because she is eating"},
+       {"text":"Insulin resistance; double the correction doses"}
+     ],
+     "rationale":"The lag runs in both directions. As beta-hydroxybutyrate converts to acetoacetate during recovery, the strip can worsen while the patient improves. A rising strip in a patient who is clinically better is not deterioration, and reacting to the strip instead of the patient is the error. A blood ketone meter, which reads beta-hydroxybutyrate directly, would show the fall."},
+
+    {"id":"ket-f-03","lab":"Ketones — urine","level":"fiendish","type":"mcq","provenance":"field","domain":"3f",
+     "stem":"A ketone strip bottle in the response bag was opened four months ago. A dipstick on a vomiting type 1 diabetic reads negative. Best action?",
+     "options":[
+       {"text":"Accept the negative result and manage the vomiting"},
+       {"text":"Repeat with fresh strips or a blood ketone meter","correct":true},
+       {"text":"Assume concentrated urine caused the negative"},
+       {"text":"Send a venous sample and wait for the result"}
+     ],
+     "rationale":"Strips give false negatives when stale; check the open-date. A very dilute urine, not a concentrated one, under-reads. A blood ketone meter sidesteps both problems, and the patient in front of you is treated meanwhile."},
+
+    {"id":"uds-f-01","lab":"Urine dipstick","level":"fiendish","type":"mcq","provenance":"field","domain":"3f",
+     "stem":"A nursing-home nurse hands you a dipstick result from a resident's catheter drainage bag: positive nitrites and leukocyte esterase. The resident is at her usual self. What does the result tell you?",
+     "options":[
+       {"text":"Catheter-associated infection; start antibiotics today"},
+       {"text":"Urosepsis until proven otherwise; transport her"},
+       {"text":"Very little; a bag sample is close to uninterpretable","correct":true},
+       {"text":"The catheter needs changing before any decision"}
+     ],
+     "rationale":"Specimen integrity. Any long-term catheter is colonized, a poorly collected mid-stream sample reads positive from perineal flora, and a catheter bag sample is worse. Without symptoms there is nothing to treat."},
+
+    {"id":"inr-f-01","lab":"INR","level":"fiendish","type":"mcq","provenance":"field","domain":"3e",
+     "stem":"A 77-year-old on warfarin has a POC INR that reads {value} on a meter validated for warfarin monitoring. She has no bleeding. Which statement about the device is correct?",
+     "values":{"value":{"set":"warfarin","min":5.0,"max":7.0,"band":2}},
+     "options":[
+       {"text":"Meters are accurate at any INR level and for any anticoagulant"},
+       {"text":"Meters are unreliable at very high INRs; confirm venously","correct":true},
+       {"text":"The result is invalid because she has no active bleeding"},
+       {"text":"Meters can also be used to monitor unfractionated heparin"}
+     ],
+     "rationale":"Band 2: hold, consult, recheck within 24–48 hours. The device point is that POC INR meters are validated for warfarin monitoring only and are unreliable with antiphospholipid antibodies and at very high values."},
+
+    {"id":"dd-f-01","lab":"D-dimer","level":"fiendish","type":"mcq","provenance":"record","domain":"3ff",
+     "stem":"Two laboratories report D-dimer for the same patient a week apart: one in FEU and one in DDU. The FEU result was {value}. The DDU result is numerically about half of that. Has the D-dimer fallen?",
+     "values":{"value":{"set":"default","min":600,"max":1200,"band":2}},
+     "options":[
+       {"text":"Yes; the value has halved within a week"},
+       {"text":"Cannot say; FEU and DDU differ about twofold","correct":true},
+       {"text":"No; DDU values run higher than FEU results do"},
+       {"text":"Yes, and it is now below the 500 cutoff"}
+     ],
+     "rationale":"Assay units differ between platforms; FEU and DDU are not interchangeable and mixing them up shifts the cutoff by roughly a factor of two."}
+  ]
+}
