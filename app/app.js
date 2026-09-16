@@ -155,7 +155,7 @@
   }
 
   function startSession(items) {
-    session = { items: items.map(renderItem), idx: 0, correct: 0, missed: [] };
+    session = { items: items.map(renderItem), idx: 0, correct: 0, answered: 0, missed: [] };
     showView("drill");
     showItem();
   }
@@ -198,6 +198,7 @@
       if (r.options[j].correct) b.classList.add("is-correct");
       else if (j === i) b.classList.add("is-wrong");
     });
+    session.answered++;
     if (chosen.correct) session.correct++; else session.missed.push(item);
 
     var row = LAB[item.lab];
@@ -250,13 +251,14 @@
     // Undo the tally for this item and re-render it with fresh numbers.
     var wasMissed = session.missed.indexOf(r.item);
     if (wasMissed >= 0) session.missed.splice(wasMissed, 1); else session.correct--;
+    session.answered--;
     session.items[session.idx] = renderItem(r.item);
     showItem();
   }
 
   function showSummary() {
-    var n = session.items.length;
-    $("summary-score").textContent = session.correct + " of " + n + " correct";
+    var n = session.answered;
+    $("summary-score").textContent = n ? session.correct + " of " + n + " correct" : "No items answered";
     var box = $("summary-missed");
     box.innerHTML = "";
     if (session.missed.length) {
@@ -343,6 +345,10 @@
       startSession(buildSession(pool, n));
     });
     $("btn-next").addEventListener("click", next);
+    $("btn-quit").addEventListener("click", function () {
+      if (session && session.idx > 0) return showSummary();
+      showView("setup");
+    });
     $("btn-reroll").addEventListener("click", reroll);
     $("btn-again").addEventListener("click", function () { showView("setup"); });
     $("btn-retry-missed").addEventListener("click", function () { startSession(shuffle(session.missed.slice())); });
