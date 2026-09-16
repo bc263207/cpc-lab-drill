@@ -312,7 +312,7 @@
       $("view-" + v).classList.toggle("hidden", v !== name);
     });
     document.querySelectorAll("nav a").forEach(function (a) {
-      a.classList.toggle("active", a.getAttribute("data-nav") === name || (name === "drill" && a.getAttribute("data-nav") === "setup"));
+      a.classList.toggle("active", a.getAttribute("data-nav") === name);
     });
     window.scrollTo({ top: 0 });
   }
