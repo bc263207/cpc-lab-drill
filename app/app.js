@@ -327,16 +327,24 @@
 
     var pc = $("panel-choices");
     DATA.table.panels.forEach(function (p) {
-      var lab = el("label");
+      var lab = el("label", "pill");
       var cb = el("input");
       cb.type = "checkbox"; cb.value = p.id; cb.checked = true;
       lab.appendChild(cb);
-      lab.appendChild(document.createTextNode(" " + p.name));
+      lab.appendChild(el("span", null, p.name));
       pc.appendChild(lab);
     });
-    $("panels-all").addEventListener("click", function () { pc.querySelectorAll("input").forEach(function (i) { i.checked = true; }); updatePoolNote(); });
-    $("panels-none").addEventListener("click", function () { pc.querySelectorAll("input").forEach(function (i) { i.checked = false; }); updatePoolNote(); });
-    $("setup-form").addEventListener("change", updatePoolNote);
+    // Mirror input state onto the styled labels (cards, pills, segments).
+    function syncSelection() {
+      document.querySelectorAll("#setup-form label").forEach(function (lab) {
+        var i = lab.querySelector("input");
+        if (i) lab.classList.toggle("selected", i.checked);
+      });
+    }
+    $("panels-all").addEventListener("click", function () { pc.querySelectorAll("input").forEach(function (i) { i.checked = true; }); syncSelection(); updatePoolNote(); });
+    $("panels-none").addEventListener("click", function () { pc.querySelectorAll("input").forEach(function (i) { i.checked = false; }); syncSelection(); updatePoolNote(); });
+    $("setup-form").addEventListener("change", function () { syncSelection(); updatePoolNote(); });
+    syncSelection();
     $("setup-form").addEventListener("submit", function (e) {
       e.preventDefault();
       var pool = poolFor(selectedLevel(), selectedPanels());

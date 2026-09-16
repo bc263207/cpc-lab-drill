@@ -24,37 +24,41 @@
     <h1>Lab value drill</h1>
     <p class="lede">Classify a lab value as normal, abnormal, or abnormal but baseline for this patient. Values are randomized inside the bands of the course lab table every time. Instant feedback, no score kept, nothing collected.</p>
 
-    <form id="setup-form" class="card">
+    <form id="setup-form" class="setup">
       <fieldset>
         <legend>Level</legend>
-        <div class="choices" id="level-choices">
-          <label><input type="radio" name="level" value="basic" checked> <b>Basic</b><span>normal vs abnormal, units always shown</span></label>
-          <label><input type="radio" name="level" value="advanced"> <b>Advanced</b><span>baseline, trend, medication interactions, anticoagulation, BNP, rule-out logic</span></label>
-          <label><input type="radio" name="level" value="fiendish"> <b>Fiendish</b><span>near-normal values, look-alike labs, specimen and unit traps</span></label>
-          <label><input type="radio" name="level" value="mixed"> <b>Mixed</b><span>everything</span></label>
+        <div class="level-grid" id="level-choices">
+          <label class="level-card basic"><input type="radio" name="level" value="basic" checked><b>Basic</b><span>Normal or abnormal. Units always shown.</span></label>
+          <label class="level-card advanced"><input type="radio" name="level" value="advanced"><b>Advanced</b><span>Baseline, trend, medication effects, anticoagulation, BNP, rule-out logic.</span></label>
+          <label class="level-card fiendish"><input type="radio" name="level" value="fiendish"><b>Fiendish</b><span>Near-normal values, look-alike labs, specimen and unit traps.</span></label>
+          <label class="level-card mixed"><input type="radio" name="level" value="mixed"><b>Mixed</b><span>Everything, drawn at random.</span></label>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>Panels</legend>
-        <div class="choices compact" id="panel-choices"></div>
-        <div class="row-actions">
-          <button type="button" class="link" id="panels-all">All</button>
-          <button type="button" class="link" id="panels-none">None</button>
+        <div class="legend-row">
+          <legend>Panels</legend>
+          <span class="row-actions">
+            <button type="button" class="link" id="panels-all">All</button>
+            <button type="button" class="link" id="panels-none">None</button>
+          </span>
         </div>
+        <div class="pills" id="panel-choices"></div>
       </fieldset>
 
       <fieldset>
         <legend>Session length</legend>
-        <div class="choices inline">
-          <label><input type="radio" name="count" value="10" checked> 10</label>
-          <label><input type="radio" name="count" value="20"> 20</label>
-          <label><input type="radio" name="count" value="all"> All available</label>
+        <div class="segmented">
+          <label><input type="radio" name="count" value="10" checked><span>10</span></label>
+          <label><input type="radio" name="count" value="20"><span>20</span></label>
+          <label><input type="radio" name="count" value="all"><span>All available</span></label>
         </div>
       </fieldset>
 
-      <p class="muted" id="pool-note"></p>
-      <button type="submit" class="primary" id="start">Start</button>
+      <div class="start-row">
+        <span class="muted" id="pool-note"></span>
+        <button type="submit" class="primary big-btn" id="start">Start drill</button>
+      </div>
     </form>
   </section>
 
