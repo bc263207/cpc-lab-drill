@@ -31,6 +31,7 @@
           <label class="level-card mode-a"><input type="radio" name="mode" value="A" checked><b>Lab value drill</b><span>One value at a time. Normal, abnormal, or this patient's baseline.</span></label>
           <label class="level-card mode-b"><input type="radio" name="mode" value="B"><b>Disposition scenarios</b><span>A patient, a visit, today's labs. Pick the tier, then the next step.</span></label>
           <label class="level-card mode-c"><input type="radio" name="mode" value="C"><b>Provider calls</b><span>Managed in place. What do you recommend to the PCP, and what do you arrange after?</span></label>
+          <label class="level-card mode-d"><input type="radio" name="mode" value="D"><b>Public health vocabulary</b><span>Community assessment, epidemiology, prevention, health behavior, systems, ethics.</span></label>
         </div>
       </fieldset>
 
@@ -53,6 +54,27 @@
           </span>
         </div>
         <div class="pills" id="panel-choices"></div>
+      </fieldset>
+
+      <fieldset data-mode="D">
+        <legend>Question style</legend>
+        <div class="segmented">
+          <label><input type="radio" name="vstyle" value="mixed" checked><span>Mixed</span></label>
+          <label><input type="radio" name="vstyle" value="define"><span>Define the term</span></label>
+          <label><input type="radio" name="vstyle" value="name"><span>Name the term</span></label>
+          <label><input type="radio" name="vstyle" value="apply"><span>Spot it in a vignette</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset data-mode="D">
+        <div class="legend-row">
+          <legend>Categories</legend>
+          <span class="row-actions">
+            <button type="button" class="link" id="vcats-all">All</button>
+            <button type="button" class="link" id="vcats-none">None</button>
+          </span>
+        </div>
+        <div class="pills" id="vcat-choices"></div>
       </fieldset>
 
       <fieldset>
@@ -95,11 +117,11 @@
         <p class="verdict" id="fb-verdict"></p>
         <p class="correct-answer" id="fb-answer"></p>
         <div class="fb-block"><h3>Rationale</h3><p id="fb-rationale"></p></div>
-        <div class="fb-block"><h3>Reference range</h3><p id="fb-ref"></p></div>
+        <div class="fb-block" id="fb-ref-block"><h3>Reference range</h3><p id="fb-ref"></p></div>
         <div class="fb-block" id="fb-band-block"><h3>Table band</h3><p id="fb-band"></p></div>
         <div class="fb-block"><h3>Source</h3><p id="fb-source"></p></div>
         <details class="row-details">
-          <summary>Master table row</summary>
+          <summary id="fb-row-title">Master table row</summary>
           <dl id="fb-row"></dl>
         </details>
         <div class="fb-actions">
@@ -222,6 +244,7 @@
       </ul>
       <p>Every value is generated inside a band from the lab table and never inside the safety margin around a cutoff, so a number is never one that one laboratory would flag and another would not. Every creatinine, hemoglobin, BNP and troponin comes with a stated baseline. Each session draws roughly 70% field-obtainable values and 30% record-review values.</p>
       <p>Era: the literature cutoff is about 2016 to match the exam. Sepsis-3 lactate threshold, textbook troponin range, digoxin 0.8–2.0, warfarin, PT and aPTT are in; DOACs, SGLT2 inhibitors, high-sensitivity troponin and age-adjusted D-dimer are out.</p>
+      <p><b>Public health vocabulary</b> drills the terms behind the Community Based Needs and Preventative Care and Education domains, a third of the exam: community assessment, epidemiology and infection control, prevention and screening, health behavior and education, social determinants, care coordination and systems, and ethics. Each question asks you to define a term, name it from its definition, or recognize it in a short vignette; the wrong answers are always real neighboring terms.</p>
       <p><b>Provider calls</b> are patients who stay home. The drill is the recommendation to the primary care provider — hold, reduce, retime, substitute, titrate, stop an over-the-counter product — and what to arrange afterward. Feedback shows one way the call might be phrased.</p>
       <p><b>Disposition scenarios</b> give a patient card, today's visit and today's results, and ask for one of four tiers: emergent ED transport now; same-day evaluation, non-emergent; PCP or clinic within 24–48 hours; or manage in place with follow-up or care coordination. A lab value is one input among several and is never the deciding factor on its own. Every scenario assumes the program protocol below, then asks one follow-up question on the next step, the reconciliation catch or the coordination action.</p>
       <p>No names, emails or scores are collected or stored.</p>

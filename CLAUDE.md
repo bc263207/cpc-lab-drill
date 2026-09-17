@@ -4,13 +4,15 @@ Working document. Covers what is decided, what is open, and the rules any item m
 
 ## What this is
 
-A practice app for the IBSC CP-C exam. Primary purpose: **exam pass rate.** Three arms.
+A practice app for the IBSC CP-C exam. Primary purpose: **exam pass rate.** Four arms.
 
 - **Arm A: lab value drill.** Three-way classification: normal, abnormal, or abnormal-but-baseline-for-this-patient.
 - **Arm B: disposition scenarios.** The main product. A lab value is one input among several, never the deciding factor on its own.
 - **Arm C: provider calls.** Patients who stay home. The drill is the recommendation to the primary care provider (hold, reduce, retime, substitute, titrate, stop an over-the-counter product) and what to arrange afterward. Same patient model and value engine as Arm B; an `ask` question replaces the tier, and a model `call` script is shown in feedback. Ten scenarios in v1.
 
-Arm A is the drill layer feeding Arms B and C.
+- **Arm D: public health vocabulary.** A glossary (`data/arm-d-glossary.json`) covering community assessment, epidemiology and infection control, prevention and screening, health behavior and education, social determinants, care coordination and systems, and ethics. Items are generated in the browser in three styles (define the term, name the term from its definition, spot it in a vignette); distractors are real terms from the same category, preferring listed confusables, never one the question text names. Definitions are 8–32 words, never contain the term, and are kept at similar lengths within a category.
+
+Arm A is the drill layer feeding Arms B and C. Arm D covers the third of the exam the lab table cannot reach.
 
 ## Build and hosting
 
@@ -106,6 +108,7 @@ Ketones in scenarios are urine dipstick results only. Never use blood ketone met
 - Every item quoting creatinine, hemoglobin, BNP, or troponin must state a baseline. Enforced in the template.
 - Albumin, hematinics, HbA1c, and pending cultures are designed with no correct transport answer. Preserve this.
 - **Arm B:** one patient per scenario; tier question plus one follow-up; one standard program protocol; ~40 scenarios in v1 (decided 2026-09-16).
+- **Arm D:** glossary-driven vocabulary drill; three generated question styles; same-category distractors (decided 2026-09-16).
 - **Arm C:** ten provider-call scenarios, every one managed in place; recommendation question plus follow-up; model call script in feedback (decided 2026-09-16).
 - **Sepsis:** Sepsis-3. Lactate over 4 mmol/L threshold stands.
 - **Troponin:** the textbook (0–0.4 ng/mL) and the conventional troponin I cutoff (about 0.04 ng/mL) differ tenfold. Randomized troponin values must never fall between 0.04 and 0.4. Normal items use values at or below 0.02. Abnormal items use values of 0.5 or higher. The row notes the discrepancy.
@@ -114,7 +117,7 @@ Ketones in scenarios are urine dipstick results only. Never use blood ketone met
 
 1. ~~Arm B patient model.~~ Settled; see Arm B disposition tiers above.
 2. **Mechanical mitral valve INR target (2.5–3.5).** Textbook gives only 2.0–3.0. Noted in the row, not removed.
-3. **Public health vocabulary arm.** Community Based Needs plus Preventative Care is 33 of 110 items. Terms like "windshield assessment" live here. Likely needs its own arm or glossary drill.
+3. ~~Public health vocabulary arm.~~ Built as Arm D (163 terms, 7 categories). Grow the glossary as gaps appear.
 4. **Additional analytes** for fiendish. Deferred.
 5. **Moodle export.** Deferred.
 
@@ -157,6 +160,7 @@ A validation script runs before every deploy. The build fails if any item has:
 - a blood ketone meter value in an Arm B scenario or in basic or advanced Arm A items
 - a missing rationale, reference range, or source
 - a non-U.S. spelling anywhere in the item bank, scenario bank, protocol, band file, or master table
+- a glossary term with a missing field, a definition outside 8–32 words, the term inside its own definition or example, an unknown category or confusable, or a category too small to supply three distractors after excluding terms the question text names
 - an Arm B scenario with an incomplete patient card, a tier outside 1–4, a missing follow-up, a blood ketone value, a urine ketone result other than negative/trace/small/moderate/large, or a transport tier on a no-transport focus lab (albumin, hematinics, HbA1c, pending cultures)
 - multiple-choice options whose longest is more than 50% longer than the shortest (warning above 25%)
 

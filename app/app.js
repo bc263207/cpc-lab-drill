@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  var DATA = {};          // table, bands, items, scenarios, protocol, tiers
+  var DATA = {};          // table, bands, items, scenarios, calls, protocol, tiers, glossary
   var LAB = {};           // lab name -> master table row
   var PANEL = {};         // panel id -> panel
   var session = null;     // { items: [rendered...], idx, correct, missed: [] }
@@ -99,6 +99,78 @@
       r.options = shuffle(item.options.map(function (o) { return { text: fill(o.text, vals), correct: !!o.correct }; }));
     }
     return r;
+  }
+
+  // ---------- vocabulary (Arm D) ----------
+  var VSTYLES = ["define", "name", "apply"];
+  var VSTYLE_LABEL = { define: "Define the term", name: "Name the term", apply: "Spot it in a vignette" };
+
+  function vocabByCat(cat) { return DATA.glossary.terms.filter(function (t) { return t.cat === cat; }); }
+
+  // Does the question text name this term? Such a term cannot be a distractor: it would be eliminable on sight.
+  function mentioned(text, t) {
+    var escaped = t.term.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("(^|[^a-z])" + escaped + "([^a-z]|$)").test(text.toLowerCase());
+  }
+
+  // Three distractors: the term's listed confusables first, then random terms from the same category,
+  // never one that the question text itself names.
+  function vocabDistractors(term, stemText) {
+    var byId = DATA.glossary.byId;
+    var ok = function (t) { return t && t.id !== term.id && t.cat === term.cat && !mentioned(stemText, t); };
+    var picks = shuffle((term.confusable || []).map(function (c) { return byId[c]; }).filter(ok)).slice(0, 3);
+    if (picks.length < 3) {
+      var pool = shuffle(vocabByCat(term.cat).filter(function (t) { return ok(t) && picks.indexOf(t) < 0; }));
+      picks = picks.concat(pool.slice(0, 3 - picks.length));
+    }
+    return picks;
+  }
+
+  // Build one drill item from a term. Returns the same shape renderItem() produces, tagged kind: "vocab".
+  function makeVocabItem(term, style) {
+    var cat = DATA.glossary.categories[term.cat];
+    var stemText = style === "define" ? term.term : (style === "name" ? term.definition : term.example);
+    var others = vocabDistractors(term, stemText);
+    var stem, opts;
+    if (style === "define") {
+      stem = "Which statement best defines " + term.term + "?";
+      opts = [term].concat(others).map(function (t) { return { text: t.definition, correct: t === term, t: t }; });
+    } else if (style === "name") {
+      stem = term.definition + "  Which term does this describe?";
+      opts = [term].concat(others).map(function (t) { return { text: t.term, correct: t === term, t: t }; });
+    } else {
+      stem = term.example + "  Which concept does this illustrate?";
+      opts = [term].concat(others).map(function (t) { return { text: t.term, correct: t === term, t: t }; });
+    }
+    return {
+      kind: "vocab",
+      item: { kind: "vocab-seed", termId: term.id, style: style, lab: term.term, level: VSTYLE_LABEL[style], provenance: "" },
+      term: term,
+      style: style,
+      cat: cat,
+      stem: stem,
+      baseline: "",
+      rationale: term.term + ": " + term.definition + " Example: " + term.example,
+      options: shuffle(opts),
+      others: others
+    };
+  }
+
+  function selectedVocabCats() {
+    return Array.prototype.slice.call(document.querySelectorAll("#vcat-choices input:checked")).map(function (i) { return i.value; });
+  }
+  function selectedVocabStyle() { return document.querySelector("input[name=vstyle]:checked").value; }
+
+  function vocabPool() {
+    var cats = selectedVocabCats();
+    return DATA.glossary.terms.filter(function (t) { return cats.indexOf(t.cat) >= 0; });
+  }
+
+  function buildVocabSession(n) {
+    var style = selectedVocabStyle();
+    return shuffle(vocabPool()).slice(0, n).map(function (t) {
+      return makeVocabItem(t, style === "mixed" ? pick(VSTYLES) : style);
+    });
   }
 
   // Concrete rendering of a scenario: numbers drawn, every text filled, follow-up shuffled.
@@ -196,6 +268,13 @@
     document.querySelectorAll("#setup-form fieldset[data-mode]").forEach(function (fs) {
       fs.classList.toggle("hidden", fs.getAttribute("data-mode") !== mode);
     });
+    if (mode === "D") {
+      var vp = vocabPool().length;
+      $("pool-note").textContent = vp ? vp + " terms available." : "No terms match this selection.";
+      $("start").disabled = !vp;
+      $("start").textContent = "Start vocabulary";
+      return;
+    }
     if (mode === "B" || mode === "C") {
       var n = (mode === "B" ? DATA.scenarios : DATA.calls).length;
       $("pool-note").textContent = n + " scenarios available.";
@@ -213,7 +292,12 @@
   }
 
   function startSession(items) {
-    session = { items: items.map(renderItem), idx: 0, correct: 0, answered: 0, missed: [] };
+    var rendered = items.map(function (i) {
+      if (i.kind === "vocab") return i;
+      if (i.kind === "vocab-seed") return makeVocabItem(DATA.glossary.byId[i.termId], i.style);
+      return renderItem(i);
+    });
+    session = { items: rendered, idx: 0, correct: 0, answered: 0, missed: [] };
     showView("drill");
     showItem();
   }
@@ -226,10 +310,19 @@
     $("drill-count").textContent = "Item " + (session.idx + 1) + " of " + session.items.length;
     $("drill-score").textContent = session.idx ? session.correct + " correct so far" : "";
 
-    $("item-level").textContent = item.level;
-    $("item-level").className = "chip level " + item.level;
-    $("item-lab").textContent = item.lab;
-    $("item-prov").textContent = item.provenance === "field" ? "field-obtainable" : "record review";
+    if (r.kind === "vocab") {
+      $("item-level").textContent = VSTYLE_LABEL[r.style];
+      $("item-level").className = "chip level vocab";
+      $("item-lab").textContent = r.cat.name;
+      $("item-prov").textContent = "";
+    } else {
+      $("item-level").textContent = item.level;
+      $("item-level").className = "chip level " + item.level;
+      $("item-lab").textContent = item.lab;
+      $("item-prov").textContent = item.provenance === "field" ? "field-obtainable" : "record review";
+    }
+    $("item-prov").classList.toggle("hidden", r.kind === "vocab");
+    $("btn-reroll").textContent = r.kind === "vocab" ? "Same term, new choices" : "Same item, new values";
     $("item-stem").textContent = r.stem;
     $("item-baseline").textContent = r.baseline ? "Baseline: " + r.baseline : "";
     $("item-baseline").classList.toggle("hidden", !r.baseline);
@@ -258,6 +351,29 @@
     });
     session.answered++;
     if (chosen.correct) session.correct++; else session.missed.push(item);
+
+    if (r.kind === "vocab") {
+      $("fb-verdict").textContent = chosen.correct ? "Correct" : "Not quite";
+      $("fb-verdict").className = "verdict " + (chosen.correct ? "ok" : "bad");
+      var ct = r.options.filter(function (o) { return o.correct; })[0].text;
+      $("fb-answer").textContent = chosen.correct ? "" : "Correct answer: " + ct;
+      $("fb-rationale").textContent = r.rationale;
+      $("fb-ref-block").classList.add("hidden");
+      $("fb-band-block").classList.add("hidden");
+      $("fb-source").textContent = r.cat.source;
+      $("fb-row-title").textContent = "The other choices";
+      var vdl = $("fb-row");
+      vdl.innerHTML = "";
+      r.others.forEach(function (t) {
+        vdl.appendChild(el("dt", null, t.term));
+        vdl.appendChild(el("dd", null, t.definition));
+      });
+      $("feedback").classList.remove("hidden");
+      $("feedback").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    $("fb-ref-block").classList.remove("hidden");
+    $("fb-row-title").textContent = "Master table row";
 
     var row = LAB[item.lab];
     $("fb-verdict").textContent = chosen.correct ? "Correct" : "Not quite";
@@ -310,7 +426,7 @@
     var wasMissed = session.missed.indexOf(r.item);
     if (wasMissed >= 0) session.missed.splice(wasMissed, 1); else session.correct--;
     session.answered--;
-    session.items[session.idx] = renderItem(r.item);
+    session.items[session.idx] = r.kind === "vocab" ? makeVocabItem(r.term, r.style) : renderItem(r.item);
     showItem();
   }
 
@@ -574,6 +690,18 @@
       lab.appendChild(el("span", null, p.name));
       pc.appendChild(lab);
     });
+    var vc = $("vcat-choices");
+    Object.keys(DATA.glossary.categories).forEach(function (cid) {
+      var lab = el("label", "pill");
+      var cb = el("input");
+      cb.type = "checkbox"; cb.value = cid; cb.checked = true;
+      lab.appendChild(cb);
+      lab.appendChild(el("span", null, DATA.glossary.categories[cid].name));
+      vc.appendChild(lab);
+    });
+    $("vcats-all").addEventListener("click", function () { vc.querySelectorAll("input").forEach(function (i) { i.checked = true; }); syncSelection(); updatePoolNote(); });
+    $("vcats-none").addEventListener("click", function () { vc.querySelectorAll("input").forEach(function (i) { i.checked = false; }); syncSelection(); updatePoolNote(); });
+
     // Mirror input state onto the styled labels (cards, pills, segments).
     function syncSelection() {
       document.querySelectorAll("#setup-form label").forEach(function (lab) {
@@ -588,6 +716,11 @@
     $("setup-form").addEventListener("submit", function (e) {
       e.preventDefault();
       var c = selectedCount();
+      if (selectedMode() === "D") {
+        var vp = vocabPool().length;
+        startSession(buildVocabSession(c === "all" ? vp : Math.min(parseInt(c, 10), vp)));
+        return;
+      }
       if (selectedMode() === "B" || selectedMode() === "C") {
         var all = shuffle((selectedMode() === "B" ? DATA.scenarios : DATA.calls).slice());
         var m = c === "all" ? all.length : Math.min(parseInt(c, 10), all.length);
@@ -634,9 +767,13 @@
     fetchJSON("data/arm-a-items.json"),
     fetchJSON("data/arm-b-scenarios.json"),
     fetchJSON("data/protocol.json"),
-    fetchJSON("data/arm-c-calls.json")
+    fetchJSON("data/arm-c-calls.json"),
+    fetchJSON("data/arm-d-glossary.json")
   ]).then(function (res) {
     DATA.calls = res[5].scenarios;
+    DATA.glossary = res[6];
+    DATA.glossary.byId = {};
+    DATA.glossary.terms.forEach(function (t) { DATA.glossary.byId[t.id] = t; });
     DATA.table = res[0];
     DATA.bands = res[1];
     DATA.items = res[2].items;

@@ -93,6 +93,8 @@ button.link { background: none; border: 0; color: var(--accent); cursor: pointer
 .level-card.mode-a { --lvl: var(--accent); }
 .level-card.mode-b { --lvl: var(--fiendish); }
 .level-card.mode-c { --lvl: var(--advanced); }
+.level-card.mode-d { --lvl: var(--ok); }
+.chip.level.vocab { background: var(--ok); text-transform: none; }
 .mode-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .level-card input { position: absolute; opacity: 0; pointer-events: none; }
 .level-card b { display: block; font-size: 1.05rem; margin-bottom: 0.15rem; }

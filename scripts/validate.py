@@ -511,6 +511,87 @@ def check_scenario(sc, bands, table_by_name, seen_ids, kind="B"):
         check_mcq(iid + "/followUp", fu["options"], fu.get("lengthException"))
 
 
+def check_glossary(g):
+    """Arm D vocabulary: structure, distractor supply, giveaway words, definition length balance."""
+    cats = g.get("categories", {}) or {}
+    terms = g.get("terms", []) or []
+    if not cats:
+        err("glossary", "no categories")
+    for cid, c in cats.items():
+        for key in ("name", "domain", "source"):
+            if not c.get(key):
+                err("glossary:" + cid, "category missing %s" % key)
+    ids = Counter(t.get("id") for t in terms)
+    names = Counter((t.get("term") or "").lower() for t in terms)
+    by_cat = defaultdict(list)
+    for t in terms:
+        tid = t.get("id") or "?"
+        if ids[tid] > 1:
+            err(tid, "duplicate glossary id")
+        if names[(t.get("term") or "").lower()] > 1:
+            err(tid, "duplicate term")
+        for key in ("term", "cat", "definition", "example"):
+            if not t.get(key):
+                err(tid, "missing %s" % key)
+        if t.get("cat") not in cats:
+            err(tid, "unknown category %r" % t.get("cat"))
+        else:
+            by_cat[t["cat"]].append(t)
+        for c in t.get("confusable", []) or []:
+            if c not in ids:
+                err(tid, "confusable %r is not a glossary id" % c)
+            elif c == tid:
+                err(tid, "term lists itself as confusable")
+        d = t.get("definition") or ""
+        words = len(d.split())
+        if words < 8 or words > 32:
+            err(tid, "definition is %d words; keep definitions between 8 and 32 words" % words)
+        term = (t.get("term") or "").lower()
+        term_rx = re.compile(r"(?<![a-z])" + re.escape(term) + r"(?![a-z])") if term else None
+        if term_rx and term_rx.search(d.lower()):
+            err(tid, "definition contains the term itself")
+        if term_rx and term_rx.search((t.get("example") or "").lower()):
+            err(tid, "example names the term")
+        for txt in (t.get("term", ""), d, t.get("example", "")):
+            hit = british_hit(txt)
+            if hit:
+                err(tid, "non-U.S. spelling %r" % hit)
+                break
+        joined = (d + " " + (t.get("example") or "")).lower()
+        for pattern, label in EXCLUDED_TERMS:
+            if re.search(pattern, joined):
+                err(tid, "mentions excluded content: %s" % label)
+    def names(text, ts_):
+        text = text.lower()
+        return [o for o in ts_ if re.search(r"(?<![a-z])" + re.escape(o["term"].lower()) + r"(?![a-z])", text)]
+
+    for cid, ts in by_cat.items():
+        if len(ts) < 5:
+            err("glossary:" + cid, "category has %d terms; at least 5 are needed to supply three distractors" % len(ts))
+        for t in ts:
+            others = [o for o in ts if o is not t]
+            for field in ("definition", "example"):
+                usable = [o for o in others if o not in names(t.get(field, ""), others)]
+                if len(usable) < 3:
+                    err(t.get("id"), "fewer than three same-category terms are left as distractors once terms named in the %s are excluded" % field)
+        lens = [len(t["definition"]) for t in ts if t.get("definition")]
+        if lens and max(lens) > 1.8 * min(lens):
+            warn("glossary:" + cid, "definition lengths span %d-%d chars; a wide spread can cue answers" % (min(lens), max(lens)))
+        for t in ts:
+            conf = [c for c in (t.get("confusable") or []) if c in ids]
+            if not conf:
+                warn(t.get("id"), "no confusable terms listed; distractors will be random within the category")
+            # A distinctive word from the term inside its own definition is a giveaway
+            # unless the category's other definitions use the word too.
+            d = (t.get("definition") or "").lower()
+            others = [(o.get("definition") or "").lower() for o in ts if o is not t]
+            for w in re.findall(r"[a-z]{8,}", (t.get("term") or "").lower()):
+                stem = w[:7]
+                if re.search(r"\b" + re.escape(stem), d) and sum(1 for o in others if re.search(r"\b" + re.escape(stem), o)) < 2:
+                    warn(t.get("id"), "definition repeats a distinctive word from the term (%r) that its neighbors do not use" % w)
+    return by_cat
+
+
 def check_item(item, bands, table_by_name, seen_ids):
     iid = item.get("id")
     if not iid:
@@ -675,6 +756,7 @@ def main():
     bank = load("arm-a-items.json")
     scen = load("arm-b-scenarios.json")
     calls = load("arm-c-calls.json")
+    glossary = load("arm-d-glossary.json")
     protocol = load("protocol.json")
 
     table_by_name = check_master_table(table)
@@ -710,6 +792,7 @@ def main():
     seen_c = set()
     for sc in call_scenarios:
         check_scenario(sc, bands, table_by_name, seen_c, kind="C")
+    gloss_by_cat = check_glossary(glossary)
 
     # Summary.
     by_level = Counter(i.get("level") for i in items)
@@ -734,6 +817,7 @@ def main():
     print("  scenarios (Arm B): %d  (tier 1 %d, tier 2 %d, tier 3 %d, tier 4 %d); focus labs covered: %d"
           % (len(scenarios), by_tier["1"], by_tier["2"], by_tier["3"], by_tier["4"], len(by_focus)))
     print("  provider calls (Arm C): %d; focus labs covered: %d" % (len(call_scenarios), len(set(sc.get("focus") for sc in call_scenarios))))
+    print("  vocabulary (Arm D): %d terms in %d categories (%s)" % (len(glossary.get("terms", [])), len(gloss_by_cat), ", ".join("%s %d" % (k, len(v)) for k, v in sorted(gloss_by_cat.items()))))
     if scenarios:
         for t in TIERS:
             share = 100.0 * by_tier[t] / len(scenarios)

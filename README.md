@@ -13,6 +13,7 @@ Practice app for the IBSC CP-C exam. Static site, no backend, no login, nothing 
 | `data/arm-a-items.json` | Arm A item bank. Item format documented in the file header. |
 | `data/arm-b-scenarios.json` | Arm B disposition scenarios: one patient per scenario, tier answer, follow-up question. Format in the file header. |
 | `data/arm-c-calls.json` | Arm C provider-call scenarios: same structure as Arm B with an `ask` (recommendation) question and a model `call` script instead of a tier. |
+| `data/arm-d-glossary.json` | Arm D vocabulary: terms with definition, example vignette, category and confusable neighbors. Questions are generated in the browser. |
 | `data/protocol.json` | The standard program protocol every scenario assumes; rendered on the About page and inside each scenario. |
 | `scripts/validate.py` | Pre-deploy checks. Netlify runs it as the build command; a failure blocks the deploy. |
 
@@ -49,4 +50,4 @@ Netlify, from this repo. `netlify.toml` sets the validator as the build command 
 
 ## Not yet built
 
-Moodle XML export is deferred; both banks resolve reference range and source from the table at export time. The public health vocabulary arm (open item 3 in CLAUDE.md) is not started.
+Moodle XML export is deferred; both banks resolve reference range and source from the table at export time. 
